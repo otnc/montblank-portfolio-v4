@@ -7,14 +7,15 @@ Astro 7 を SSR (`output: 'server'`) で動かし、Cloudflare Pages に置い�
 ```text
 src/
 ├── pages/index.astro            データを取得し、部品を並べるだけ
+├── pages/404.astro              見つからないページ
 ├── layouts/DuskLayout.astro     <head>、ヘッダー、港の水面と石畳、フッター、共通スクリプト
 ├── components/
 │   ├── dusk/
 │   │   ├── Hero.astro               夕焼けの空、アイコン、名前、SNS アイコン
 │   │   ├── DuskSky.astro            雲、一番星、カラス
-│   │   ├── BayView.astro            函館山、ロープウェイ、元町、赤レンガ倉庫と運河、水面
+│   │   ├── BayView.astro            函館山、ロープウェイ、元町の屋根、赤レンガ倉庫と運河、水面
 │   │   ├── Marquee.astro            流れるメッセージ
-│   │   ├── HarborLife.astro         港の水面の波、ボート、イカ釣り船の漁火、ブイ、カモメ
+│   │   ├── HarborLife.astro         港の水面の波、泳ぐイカ、カモメ
 │   │   ├── StonePath.astro          ウィンドウの下の石畳 (八幡坂の舗装)
 │   │   ├── AboutWindow.astro        自己紹介、キャッチコピー、趣味・所属など、SNS
 │   │   ├── BlogWindow.astro         記事 (ブログ、Zenn、Qiita、note)
