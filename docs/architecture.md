@@ -13,7 +13,6 @@ src/
 │   │   ├── Hero.astro               夕焼けの空、アイコン、名前、SNS アイコン
 │   │   ├── DuskSky.astro            雲、一番星、カラス
 │   │   ├── BayView.astro            函館山、ロープウェイ、元町、赤レンガ倉庫と運河、水面
-│   │   ├── FallingLeaves.astro      落ち葉 (ヒーローだけ、少なめ)
 │   │   ├── Marquee.astro            流れるメッセージ
 │   │   ├── HarborLife.astro         港の水面の波、ボート、イカ釣り船の漁火、ブイ、カモメ
 │   │   ├── StonePath.astro          ウィンドウの下の石畳 (八幡坂の舗装)

@@ -1,6 +1,5 @@
 ---
 import DuskSky from '@/components/dusk/DuskSky.astro';
-import FallingLeaves from '@/components/dusk/FallingLeaves.astro';
 import BayView from '@/components/dusk/BayView.astro';
 import Window from '@/components/dusk/Window.astro';
 import PixelIcon from '@/components/PixelIcon.astro';
@@ -21,7 +20,6 @@ const heroAccounts = accounts.filter((account, index) => accounts.findIndex((oth
 	</div>
 	<DuskSky />
 	<BayView />
-	<FallingLeaves count={6} seed={1102} />
 	<div class="hero__inner">
 		<Window title="marron.png" class="avatar-window" flush>
 			<div class="avatar" data-avatar data-src={profile.icon}>
