@@ -112,17 +112,17 @@ export const career: CareerItem[] = [
 export interface CrossLink {
 	author: string;
 	url: string;
-	/** Their banner image, shown instead of the name when given. */
+	/** Their banner or icon, shown at half size next to the name. Kept small in public/partners/, taken from their OGP image or icon. */
 	banner?: { src: string; width: number; height: number };
 }
 
-// Sites that link back here. Add `banner` to show their banner image instead of the name.
+// Sites that link back here.
 export const crossLinks: CrossLink[] = [
-	{ author: 'キノえもん', url: 'https://kinoemon.com' },
-	{ author: 'shikoshib', url: 'https://shikoshib.ru' },
-	{ author: 'ActiveTK.', url: 'https://profile.activetk.jp' },
-	{ author: 'sugimoto', url: 'https://sugimoto.fun' },
-	{ author: 'Np', url: 'https://negapainter.work' },
+	{ author: 'キノえもん', url: 'https://kinoemon.com', banner: { src: '/partners/kinoemon.webp', width: 120, height: 120 } },
+	{ author: 'shikoshib', url: 'https://shikoshib.ru', banner: { src: '/partners/shikoshib.webp', width: 120, height: 120 } },
+	{ author: 'ActiveTK.', url: 'https://profile.activetk.jp', banner: { src: '/partners/activetk.webp', width: 120, height: 120 } },
+	{ author: 'sugimoto', url: 'https://sugimoto.fun', banner: { src: '/partners/sugimoto.webp', width: 120, height: 120 } },
+	{ author: 'Np', url: 'https://negapainter.work', banner: { src: '/partners/np.webp', width: 265, height: 120 } },
 ];
 
 const crossLinkRequestMessage = [

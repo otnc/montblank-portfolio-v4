@@ -97,7 +97,7 @@ GraphQL にしたのは、リクエスト数を抑えるためです。Pages の
 
 ### 相互リンクを足す
 
-`src/data/profile.ts` の `crossLinks` に `{ author, url }` を足します。相手のバナーを出すときは `banner: { src, width, height }` も付けます。
+`src/data/profile.ts` の `crossLinks` に `{ author, url }` を足します。画像は相手のサイトの OGP 画像かアイコンを高さ 120px に縮めて `public/partners/` に置き、`banner: { src, width, height }` で指定します (表示は半分の大きさ)。大きな元画像を直リンクすると重くなるので、必ず縮めて置きます。
 
 ### アカウントを足す
 

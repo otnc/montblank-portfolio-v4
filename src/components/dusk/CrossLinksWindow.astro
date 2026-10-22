@@ -20,14 +20,13 @@ const hostname = (url: string) => new URL(url).hostname;
 			crossLinks.map((link) => (
 				<li>
 					<a href={link.url} target="_blank" rel="noreferrer">
-						{link.banner ? (
-							<img src={link.banner.src} width={link.banner.width} height={link.banner.height} alt={link.author} />
-						) : (
-							<>
-								<span class="partners__name">{link.author}</span>
-								<span class="muted">{hostname(link.url)}</span>
-							</>
+						{link.banner && (
+							<img src={link.banner.src} width={link.banner.width / 2} height={link.banner.height / 2} alt="" loading="lazy" />
 						)}
+						<span class="partners__text">
+							<span class="partners__name">{link.author}</span>
+							<span class="muted">{hostname(link.url)}</span>
+						</span>
 					</a>
 				</li>
 			))
@@ -35,10 +34,10 @@ const hostname = (url: string) => new URL(url).hostname;
 	</ul>
 
 	<h3 class="section-gap">相互リンクの申請</h3>
+	<p class="request"><a class="pixel-button" href={crossLinkRequest.url} target="_blank" rel="noreferrer">Request</a></p>
 	<ul class="requirements">
 		{crossLinkRequest.requirements.map((requirement) => <li>{requirement}</li>)}
 	</ul>
-	<p class="request"><a class="pixel-button" href={crossLinkRequest.url} target="_blank" rel="noreferrer">Request</a></p>
 
 	<h3 class="section-gap">このサイトのバナー</h3>
 	<p class="muted">直リンクして大丈夫です。</p>
@@ -62,18 +61,36 @@ const hostname = (url: string) => new URL(url).hostname;
 <style>
 	.partners {
 		display: grid;
-		gap: 4px;
+		grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+		gap: 8px 16px;
 		margin-top: 8px;
 	}
 
 	.partners a {
 		display: flex;
-		flex-wrap: wrap;
-		align-items: baseline;
-		gap: 0 12px;
-		padding: 2px 8px;
+		align-items: center;
+		gap: 12px;
+		padding: 6px 8px;
 		color: var(--ink);
 		text-decoration: none;
+	}
+
+	/* Their images are photos and illustrations, not pixel art, so they keep smooth scaling. */
+	.partners img {
+		flex: none;
+		height: 60px;
+		width: auto;
+		outline: 3px solid var(--ink);
+		transition: transform 0.12s steps(2);
+	}
+
+	.partners a:hover img {
+		transform: translateY(-3px);
+	}
+
+	.partners__text {
+		display: grid;
+		min-width: 0;
 	}
 
 	.partners a:hover,
@@ -85,7 +102,6 @@ const hostname = (url: string) => new URL(url).hostname;
 		text-decoration: underline;
 	}
 
-	.partners img,
 	.banners img {
 		display: block;
 		max-width: 100%;
@@ -99,7 +115,7 @@ const hostname = (url: string) => new URL(url).hostname;
 	}
 
 	.requirements {
-		margin-top: 4px;
+		margin-top: 12px;
 	}
 
 	.requirements li::before {
@@ -108,7 +124,7 @@ const hostname = (url: string) => new URL(url).hostname;
 	}
 
 	.request {
-		margin-top: 12px;
+		margin-top: 8px;
 	}
 
 	.banners {
