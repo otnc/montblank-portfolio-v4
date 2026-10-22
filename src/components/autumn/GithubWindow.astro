@@ -1,0 +1,119 @@
+---
+import LanguageBar from '@/components/autumn/LanguageBar.astro';
+import Window from '@/components/autumn/Window.astro';
+import { profile } from '@/data/profile';
+import { formatCount } from '@/lib/format';
+import type { GithubStats } from '@/lib/github';
+
+interface Props {
+	stats: GithubStats | null;
+}
+
+const { stats } = Astro.props;
+const profileUrl = `https://github.com/${profile.handle}`;
+const peak = stats ? Math.max(1, ...stats.recentDays.map((day) => day.count)) : 1;
+// Bars snap to whole 3px dots, from 0 to GRAPH_DOTS dots tall.
+const GRAPH_DOTS = 24;
+---
+
+<Window title={`github.com/${profile.handle}`} class="window--right">
+	<h2>GitHub</h2>
+	{
+		stats ? (
+			<>
+				<dl class="numbers">
+					<div>
+						<dt>Total Contributions</dt>
+						<dd>{formatCount(stats.totalContributions)}</dd>
+					</div>
+					<div>
+						<dt>Followers</dt>
+						<dd>{formatCount(stats.followers)}</dd>
+					</div>
+					<div>
+						<dt>Public Repos</dt>
+						<dd>{formatCount(stats.publicRepos)}</dd>
+					</div>
+					<div>
+						<dt>Total Stars</dt>
+						<dd>{formatCount(stats.totalStars)}</dd>
+					</div>
+				</dl>
+
+				<h3>言語</h3>
+				<LanguageBar languages={stats.languages} labelled={8} />
+
+				<h3 class="graph-heading">直近31日間のコミット数</h3>
+				<ol class="graph" style={`--graph-dots:${GRAPH_DOTS}`}>
+					{stats.recentDays.map((day) => (
+						<li title={`${day.date}: ${day.count}`} style={`--dots:${Math.ceil((day.count / peak) * GRAPH_DOTS)}`}>
+							<span class="visually-hidden">
+								{day.date}: {day.count}
+							</span>
+						</li>
+					))}
+				</ol>
+			</>
+		) : (
+			<p class="notice">
+				GitHub の情報を読み込めませんでした。
+				<a href={profileUrl} target="_blank" rel="noreferrer">
+					GitHub
+				</a>
+				で見てください。
+			</p>
+		)
+	}
+</Window>
+
+<style>
+	.numbers {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+		gap: 12px;
+		margin: 8px 0 24px;
+	}
+
+	.numbers div {
+		padding: 8px 12px;
+		background: var(--marron-light);
+	}
+
+	.numbers dt {
+		color: var(--muted);
+	}
+
+	.numbers dd {
+		margin: 0;
+		font-family: var(--font-heading);
+		font-size: 24px;
+		line-height: 36px;
+	}
+
+	.graph-heading {
+		margin-top: 24px;
+	}
+
+	.graph {
+		display: flex;
+		align-items: flex-end;
+		gap: 3px;
+		height: calc(var(--graph-dots) * var(--dot));
+		margin-top: 8px;
+		border-bottom: 3px solid var(--ink);
+	}
+
+	.graph li {
+		flex: 1;
+		height: calc(var(--dots) * var(--dot));
+		background: var(--accent);
+	}
+
+	.visually-hidden {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+	}
+</style>

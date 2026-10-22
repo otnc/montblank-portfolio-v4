@@ -1,0 +1,36 @@
+---
+/**
+ * The way to otoneko.cat, the counterpart of its bottle mail.
+ * The motif is not decided yet, so this is a plain letter for now.
+ */
+import { otherSelf } from '@/data/profile';
+---
+
+<section class="other-self" data-reveal>
+	<div class="other-self__letter">
+		<h2>もうひとりのわたし</h2>
+		<p>{otherSelf.summary}</p>
+		<div class="other-self__actions">
+			<a class="pixel-button pixel-button--cream" href={otherSelf.twitter.url} target="_blank" rel="noreferrer">X {otherSelf.twitter.handle}</a>
+			<a class="pixel-button" href={otherSelf.site.url} target="_blank" rel="noreferrer">{otherSelf.site.label} へ</a>
+		</div>
+	</div>
+</section>
+
+<style>
+	.other-self__letter {
+		padding: 24px;
+		background: var(--paper);
+		border: 5px solid var(--ink);
+		border-image: var(--pixel-corner-ink) 3 / 2 / 2 stretch;
+		background-clip: padding-box;
+		filter: drop-shadow(9px 9px 0 #00000040);
+	}
+
+	.other-self__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 16px;
+		margin-top: 16px;
+	}
+</style>

@@ -1,0 +1,92 @@
+---
+interface Props {
+	messages: string[];
+}
+
+const { messages } = Astro.props;
+---
+
+<div class="marquee" aria-hidden="true">
+	<div class="marquee__track" data-marquee>
+		<div class="marquee__group">
+			{
+				messages.map((message) => (
+					<>
+						<span>{message}</span>
+						<span class="marquee__sep">◆</span>
+					</>
+				))
+			}
+		</div>
+	</div>
+</div>
+
+<script>
+	import { setupMarquee } from '@/scripts/marquee';
+
+	const track = document.querySelector<HTMLElement>('[data-marquee]');
+	if (track) setupMarquee(track, window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+</script>
+
+<style>
+	.marquee {
+		overflow: hidden;
+		background: var(--ink);
+		color: var(--marquee-text);
+		border-block: 4px solid var(--frame);
+		white-space: nowrap;
+	}
+
+	/*
+	 * The track holds identical copies of one message group (added by scripts/marquee.ts to cover the viewport).
+	 * It slides by exactly one group width, so the last frame matches the first and the loop has no visible seam.
+	 */
+	.marquee__track {
+		display: flex;
+		width: max-content;
+		will-change: transform;
+	}
+
+	/* Hidden until measured, so the jump to the centred start is never seen. */
+	:global(.js) .marquee__track:not(.is-ready) {
+		visibility: hidden;
+	}
+
+	.marquee__track.is-ready {
+		transform: translateX(var(--marquee-start, 0));
+	}
+
+	.marquee__track.is-running {
+		animation: marquee var(--marquee-duration, 40s) linear var(--marquee-delay, 0s) infinite;
+	}
+
+	.marquee__group {
+		display: flex;
+		flex: none;
+	}
+
+	.marquee__group :global(span) {
+		flex: none;
+		padding-right: 40px;
+	}
+
+	.marquee__group :global(.marquee__sep) {
+		color: var(--accent);
+	}
+
+	/* `from` is explicit: otherwise it would start from the resting --marquee-start transform. */
+	@keyframes marquee {
+		from {
+			transform: translateX(0);
+		}
+		to {
+			transform: translateX(var(--marquee-shift, -50%));
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.marquee__track {
+			animation: none;
+		}
+	}
+</style>

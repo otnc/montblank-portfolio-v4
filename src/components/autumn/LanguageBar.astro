@@ -1,0 +1,64 @@
+---
+import type { LanguageShare } from '@/lib/github';
+
+interface Props {
+	languages: LanguageShare[];
+	/** How many languages get a label; the bar always shows every language. */
+	labelled?: number;
+}
+
+const { languages, labelled = 3 } = Astro.props;
+const percent = (value: number) => (value >= 10 ? value.toFixed(0) : value.toFixed(1));
+---
+
+{
+	languages.length > 0 && (
+		<div class="languages">
+			<div class="languages__bar" aria-hidden="true">
+				{languages.map((language) => (
+					<span style={`flex-grow:${language.percentage};background:${language.color}`} />
+				))}
+			</div>
+			<ul class="languages__list">
+				{languages.slice(0, labelled).map((language) => (
+					<li>
+						<span class="languages__dot" style={`background:${language.color}`} />
+						{language.name} <span class="muted">{percent(language.percentage)}%</span>
+					</li>
+				))}
+			</ul>
+		</div>
+	)
+}
+
+<style>
+	.languages__bar {
+		display: flex;
+		height: 9px;
+		outline: 3px solid var(--ink);
+	}
+
+	.languages__bar span {
+		flex-basis: 0;
+		min-width: 3px;
+	}
+
+	.languages__list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0 16px;
+		margin-top: 6px;
+	}
+
+	.languages__list li {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+	}
+
+	.languages__dot {
+		width: 9px;
+		height: 9px;
+		outline: 2px solid var(--ink);
+	}
+</style>

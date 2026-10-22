@@ -1,0 +1,64 @@
+---
+import PixelIcon from '@/components/PixelIcon.astro';
+import { profile, writingSites } from '@/data/profile';
+---
+
+<header class="header">
+	<a class="header__logo" href="/">{profile.name}</a>
+	<nav aria-label="記事">
+		<ul class="header__links">
+			{
+				writingSites.map((site) => (
+					<li>
+						<a href={site.url} target="_blank" rel="noreferrer">
+							<PixelIcon name={site.icon} scale={2} />
+							<span>{site.label}</span>
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</nav>
+</header>
+
+<style>
+	.header {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px 24px;
+		max-width: 1040px;
+		margin: 0 auto;
+		padding: 16px;
+	}
+
+	.header__logo {
+		font-family: var(--font-heading);
+		font-size: 24px;
+		line-height: 36px;
+		color: var(--ink) !important;
+		text-decoration: none;
+	}
+
+	.header__links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 4px 16px;
+	}
+
+	.header__links a {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		color: var(--ink);
+		text-decoration: none;
+		transition: transform 0.12s steps(2);
+	}
+
+	.header__links a:hover,
+	.header__links a:focus-visible {
+		transform: translateY(-3px);
+		text-decoration: underline;
+	}
+</style>

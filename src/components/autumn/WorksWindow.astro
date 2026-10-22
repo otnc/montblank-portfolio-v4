@@ -1,0 +1,97 @@
+---
+import LanguageBar from '@/components/autumn/LanguageBar.astro';
+import Window from '@/components/autumn/Window.astro';
+import { profile } from '@/data/profile';
+import { formatCompact } from '@/lib/format';
+import type { Work } from '@/lib/github';
+
+interface Props {
+	works: Work[] | null;
+}
+
+const { works } = Astro.props;
+const repositoriesUrl = `https://github.com/${profile.handle}?tab=repositories`;
+---
+
+<Window title={`/${profile.handle}/works/`} class="window--right">
+	<h2>Works</h2>
+	{
+		works && works.length > 0 ? (
+			<ul class="works">
+				{works.map((work) => (
+					<li class="work">
+						<h3>{work.owner === profile.handle ? work.name : `${work.owner}/${work.name}`}</h3>
+						<p class="work__desc" title={work.description}>
+							{work.description}
+						</p>
+						<LanguageBar languages={work.languages} />
+						<p class="work__links">
+							<span class="muted">★ {formatCompact(work.stars)}</span>
+							{work.homepage && (
+								<a href={work.homepage} target="_blank" rel="noreferrer">
+									Link
+								</a>
+							)}
+							<a href={work.url} target="_blank" rel="noreferrer">
+								GitHub
+							</a>
+						</p>
+					</li>
+				))}
+			</ul>
+		) : (
+			<p class="notice">GitHub から作品を読み込めませんでした。</p>
+		)
+	}
+	<p class="more">
+		<a class="pixel-button" href={repositoriesUrl} target="_blank" rel="noreferrer">More</a>
+	</p>
+</Window>
+
+<style>
+	.works {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		gap: 16px;
+		margin-top: 8px;
+	}
+
+	.work {
+		display: grid;
+		align-content: start;
+		gap: 8px;
+		padding: 12px;
+		outline: 2px dashed var(--muted);
+		outline-offset: -2px;
+	}
+
+	.work:hover,
+	.work:focus-within {
+		background: var(--marron-light);
+		outline-color: var(--ink);
+	}
+
+	.work h3 {
+		overflow-wrap: anywhere;
+	}
+
+	/* Descriptions come from GitHub and vary in length, so keep every card to two lines. */
+	.work__desc {
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+		line-clamp: 2;
+		overflow: hidden;
+		overflow-wrap: anywhere;
+	}
+
+	.work__links {
+		display: flex;
+		gap: 16px;
+	}
+
+	.more {
+		margin-top: 24px;
+		text-align: right;
+	}
+</style>

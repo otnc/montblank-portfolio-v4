@@ -1,0 +1,106 @@
+---
+import Window from '@/components/autumn/Window.astro';
+import PixelIcon from '@/components/PixelIcon.astro';
+import { writingSites } from '@/data/profile';
+import type { Post } from '@/lib/feeds';
+import { formatDate } from '@/lib/format';
+
+interface Props {
+	posts: Post[] | null;
+}
+
+const { posts } = Astro.props;
+const siteBySource = new Map(writingSites.map((site) => [site.label, site]));
+---
+
+<Window title="feeds/" class="window--left">
+	<h2>Blog</h2>
+	{
+		posts && posts.length > 0 ? (
+			<ul class="posts">
+				{posts.map((post) => {
+					const site = siteBySource.get(post.source);
+					return (
+						<li>
+							<a class="post" href={post.url} target="_blank" rel="noreferrer">
+								{site && <PixelIcon name={site.icon} scale={2} />}
+								<span class="post__body">
+									<span class="post__title">{post.title}</span>
+									{post.description && <span class="post__desc muted">{post.description}</span>}
+									<span class="post__meta muted">
+										{post.source} {formatDate(post.date)}
+									</span>
+								</span>
+							</a>
+						</li>
+					);
+				})}
+			</ul>
+		) : (
+			<p class="notice">記事を読み込めませんでした。</p>
+		)
+	}
+	<p class="more">
+		{
+			writingSites.map((site) => (
+				<a href={site.url} target="_blank" rel="noreferrer">
+					{site.label}
+				</a>
+			))
+		}
+	</p>
+</Window>
+
+<style>
+	.posts {
+		display: grid;
+		gap: 4px;
+		margin-top: 8px;
+		max-height: 600px;
+		overflow-y: auto;
+	}
+
+	.post {
+		display: flex;
+		gap: 12px;
+		padding: 8px;
+		color: var(--ink);
+		text-decoration: none;
+	}
+
+	.post:hover,
+	.post:focus-visible {
+		background: var(--marron-light);
+	}
+
+	.post :global(.pixel-icon) {
+		flex: none;
+		margin-top: 3px;
+	}
+
+	.post__body {
+		display: grid;
+		min-width: 0;
+	}
+
+	.post__title {
+		text-decoration: underline;
+	}
+
+	/* Descriptions vary in length, so keep every post to two lines. */
+	.post__desc {
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+		line-clamp: 2;
+		overflow: hidden;
+		overflow-wrap: anywhere;
+	}
+
+	.more {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0 16px;
+		margin-top: 16px;
+	}
+</style>

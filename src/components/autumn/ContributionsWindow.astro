@@ -1,0 +1,69 @@
+---
+import LanguageBar from '@/components/autumn/LanguageBar.astro';
+import Window from '@/components/autumn/Window.astro';
+import { formatCompact } from '@/lib/format';
+import type { Contribution } from '@/lib/github';
+
+interface Props {
+	contributions: Contribution[] | null;
+}
+
+const { contributions } = Astro.props;
+---
+
+<Window title="contributions.txt" class="window--left">
+	<h2>Contributions</h2>
+	<p class="muted">他のリポジトリにマージされたプルリクエスト</p>
+	{
+		contributions && contributions.length > 0 ? (
+			<ul class="repos">
+				{contributions.map((repo) => (
+					<li>
+						<a class="repo" href={repo.url} target="_blank" rel="noreferrer">
+							<span class="repo__name">
+								<span class="muted">{repo.owner}/</span>
+								{repo.name}
+							</span>
+							<span class="repo__counts">
+								<span title="Stars">★ {formatCompact(repo.stars)}</span>
+								<span title="Merged pull requests">PR {repo.mergedCount}</span>
+							</span>
+						</a>
+						<LanguageBar languages={repo.languages} labelled={2} />
+					</li>
+				))}
+			</ul>
+		) : contributions ? (
+			<p class="notice">まだありません。</p>
+		) : (
+			<p class="notice">GitHub から読み込めませんでした。</p>
+		)
+	}
+</Window>
+
+<style>
+	.repos {
+		display: grid;
+		gap: 16px;
+		margin-top: 12px;
+		max-height: 640px;
+		overflow-y: auto;
+	}
+
+	.repo {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: 0 16px;
+		color: var(--ink);
+	}
+
+	.repo__name {
+		overflow-wrap: anywhere;
+	}
+
+	.repo__counts {
+		display: flex;
+		gap: 16px;
+	}
+</style>

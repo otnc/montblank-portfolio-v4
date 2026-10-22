@@ -1,0 +1,179 @@
+---
+interface Props {
+	title: string;
+	class?: string;
+	/** Drops the body padding, e.g. for an image that should touch the frame. */
+	flush?: boolean;
+}
+
+const { title, class: className, flush = false } = Astro.props;
+---
+
+<div class:list={['window-shell', className]} data-reveal>
+	<span class="window-zoom" aria-hidden="true"></span>
+	<span class="window-zoom window-zoom--trail" aria-hidden="true"></span>
+	<section class="window">
+		<header class="window__bar">
+			<span class="window__icon" aria-hidden="true"></span>
+			<span class="window__title">{title}</span>
+			<span class="window__buttons" aria-hidden="true">
+				<span class="window__button">
+					<svg viewBox="0 0 8 8" shape-rendering="crispEdges"><rect x="1" y="6" width="5" height="2" /></svg>
+				</span>
+				<span class="window__button">
+					<svg viewBox="0 0 8 8" shape-rendering="crispEdges">
+						<path d="M0 0h8v2H0zM0 2h1v6H0zM7 2h1v6H7zM1 7h6v1H1z" />
+					</svg>
+				</span>
+				<span class="window__button">
+					<svg viewBox="0 0 8 8" shape-rendering="crispEdges">
+						<path d="M0 0h2v1H0zM6 0h2v1H6zM1 1h2v1H1zM5 1h2v1H5zM2 2h4v1H2zM3 3h2v2H3zM2 5h4v1H2zM1 6h2v1H1zM5 6h2v1H5zM0 7h2v1H0zM6 7h2v1H6z" />
+					</svg>
+				</span>
+			</span>
+		</header>
+		<div class:list={['window__body', { 'window__body--flush': flush }]}>
+			<slot />
+		</div>
+	</section>
+</div>
+
+<style>
+	/* Classic desktop "zoom rects": dashed outlines grow from the centre in a few hard steps, then the window pops in. */
+	.window-shell {
+		position: relative;
+	}
+
+	.window-zoom {
+		position: absolute;
+		inset: 0;
+		border: 3px dashed var(--frame);
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	:global(.js) .window-shell:not(.is-visible) .window {
+		visibility: hidden;
+	}
+
+	:global(.js) .window-shell.is-visible .window {
+		animation: window-pop 0.42s steps(1) both;
+	}
+
+	:global(.js) .window-shell.is-visible .window-zoom {
+		animation: zoom-rect 0.42s steps(5) both;
+	}
+
+	:global(.js) .window-shell.is-visible .window-zoom--trail {
+		animation-delay: 0.08s;
+		border-style: dotted;
+	}
+
+	@keyframes zoom-rect {
+		0% {
+			opacity: 1;
+			transform: scale(0.08, 0.12);
+		}
+		85% {
+			opacity: 1;
+			transform: scale(1);
+		}
+		100% {
+			opacity: 0;
+			transform: scale(1);
+		}
+	}
+
+	@keyframes window-pop {
+		0%,
+		84% {
+			visibility: hidden;
+		}
+		85%,
+		100% {
+			visibility: visible;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		:global(.js) .window-shell .window {
+			visibility: visible;
+			animation: none;
+		}
+
+		.window-zoom {
+			display: none;
+		}
+	}
+
+	.window {
+		position: relative;
+		background: var(--window);
+		color: var(--text);
+		border: 5px solid var(--frame);
+		border-image: var(--pixel-corner) 3 / 2 / 2 stretch;
+		/* Keep the background inside the frame so the notched pixel corners stay open. */
+		background-clip: padding-box;
+		/* drop-shadow follows the frame's notched outline; a box-shadow would square off the corners. */
+		filter: drop-shadow(9px 9px 0 #00000066);
+	}
+
+	.window__bar {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 0 8px;
+		background: repeating-linear-gradient(0deg, var(--bar) 0 2px, var(--bar-stripe) 2px 4px);
+		border-bottom: 4px solid var(--ink);
+		color: var(--bar-text);
+		line-height: 30px;
+	}
+
+	.window__icon {
+		width: 12px;
+		height: 12px;
+		background: var(--accent);
+		box-shadow: 3px 3px 0 var(--ink);
+	}
+
+	.window__title {
+		flex: 1;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+
+	.window__buttons {
+		display: flex;
+		gap: 2px;
+	}
+
+	/* Bevelled like an old OS title button: light top-left edge, dark bottom-right edge. */
+	.window__button {
+		display: grid;
+		place-items: center;
+		width: 22px;
+		height: 20px;
+		background: var(--button);
+		box-shadow:
+			inset -2px -2px 0 var(--button-shade),
+			inset 2px 2px 0 var(--button-light),
+			0 0 0 2px var(--ink);
+	}
+
+	.window__button svg {
+		width: 8px;
+		height: 8px;
+		fill: var(--ink);
+		translate: -1px -1px;
+	}
+
+	.window__body {
+		padding: 20px;
+	}
+
+	.window__body--flush {
+		padding: 0;
+		line-height: 0;
+	}
+</style>

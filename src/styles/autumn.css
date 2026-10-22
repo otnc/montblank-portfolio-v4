@@ -1,0 +1,286 @@
+/*
+ * Design rules live in docs/rules.md.
+ * Text uses PixelMplus at exact multiples of its grid so every dot stays square: PixelMplus10 at 20px for body text, PixelMplus12 at 24px and 48px for headings.
+ * The palette is still the first draft from docs/rules.md and will change once the concept is settled.
+ */
+:root {
+	--shell: #4a2c1d;
+	--shell-light: #7a4a2b;
+	--marron: #c99a6b;
+	--marron-light: #e8cba3;
+	--cream: #fff4e2;
+	--maple: #c8442f;
+	--ginkgo: #e8b23a;
+	--dusk: #f0a57a;
+	--link: #2f6f8f;
+	--visited: #6a4a8f;
+
+	/* Roles, so components never name a raw palette colour. */
+	--ink: var(--shell);
+	--text: var(--shell);
+	--muted: var(--shell-light);
+	--paper: var(--cream);
+	--window: var(--cream);
+	--frame: var(--shell);
+	--bar: var(--marron);
+	--bar-stripe: #bd8d5f;
+	--bar-text: var(--shell);
+	--button: var(--marron-light);
+	--button-light: var(--cream);
+	--button-shade: var(--marron);
+	--accent: var(--maple);
+	--heading: var(--maple);
+	--marquee-text: var(--ginkgo);
+
+	/* Shared size of one pixel-art dot for icons, sprites and edges. */
+	--dot: 3px;
+	--font-body: 'PixelMplus10', 'PixelMplus10 Extra', monospace;
+	--font-heading: 'PixelMplus12', 'PixelMplus12 Extra', monospace;
+	--pixel-corner: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M3 1h1v1h-1zM4 1h1v1h-1zM2 2h1v1h-1zM5 2h1v1h-1zM1 3h1v1h-1zM6 3h1v1h-1zM1 4h1v1h-1zM6 4h1v1h-1zM2 5h1v1h-1zM5 5h1v1h-1zM3 6h1v1h-1zM4 6h1v1h-1z' fill='%234a2c1d'/%3E%3C/svg%3E");
+	--pixel-corner-ink: var(--pixel-corner);
+	color-scheme: light;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html {
+	scroll-behavior: smooth;
+}
+
+body {
+	position: relative;
+	margin: 0;
+	background: var(--dusk);
+	color: var(--text);
+	font-family: var(--font-body);
+	font-size: 20px;
+	line-height: 30px;
+	-webkit-font-smoothing: none;
+}
+
+/* Decorations may run past the viewport edges; clip them here rather than on <body>, whose overflow does not clip reliably. */
+.site {
+	overflow-x: hidden;
+	overflow-x: clip;
+}
+
+h1,
+h2,
+h3,
+p {
+	margin: 0;
+}
+
+h1 {
+	font-family: var(--font-heading);
+	font-size: 48px;
+	line-height: 60px;
+}
+
+h2 {
+	font-family: var(--font-heading);
+	font-size: 24px;
+	line-height: 36px;
+	color: var(--heading);
+}
+
+h3 {
+	font-size: 20px;
+	line-height: 30px;
+}
+
+ul,
+ol {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+a {
+	color: var(--link);
+}
+
+a:visited {
+	color: var(--visited);
+}
+
+::selection {
+	background: var(--ginkgo);
+	color: var(--ink);
+}
+
+.muted {
+	color: var(--muted);
+}
+
+.skip-link {
+	position: absolute;
+	left: -9999px;
+}
+
+.skip-link:focus {
+	left: 16px;
+	top: 16px;
+	z-index: 10;
+	padding: 0 8px;
+	background: var(--paper);
+	color: var(--ink);
+}
+
+/* ---- Buttons ---- */
+
+.pixel-button {
+	--button-bg: var(--ginkgo);
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 0 12px;
+	background: var(--button-bg);
+	color: var(--ink) !important;
+	text-decoration: none;
+	border: 5px solid var(--ink);
+	border-image: var(--pixel-corner-ink) 3 / 2 / 2 stretch;
+	box-shadow:
+		2px 2px 0 2px var(--ink),
+		-2px -2px 0 2px var(--button-bg);
+	transition: transform 0.12s steps(2);
+}
+
+.pixel-button--cream {
+	--button-bg: var(--cream);
+}
+
+.pixel-button:hover,
+.pixel-button:focus-visible {
+	transform: translate(-2px, -2px);
+}
+
+.pixel-button:active {
+	transform: translateY(2px);
+	box-shadow:
+		2px 2px 0 2px var(--button-bg),
+		-2px -2px 0 2px var(--button-bg);
+}
+
+/* Short tags such as hobbies and affiliations. */
+.tag {
+	padding: 0 8px;
+	background: var(--marron-light);
+	color: var(--ink);
+}
+
+/* Shown in place of a section whose data could not be fetched. */
+.notice {
+	padding: 8px 12px;
+	outline: 2px dashed var(--muted);
+	outline-offset: -2px;
+	color: var(--muted);
+}
+
+.is-paused *,
+.is-paused *::before,
+.is-paused *::after {
+	animation-play-state: paused !important;
+}
+
+/* ---- Reveal ---- */
+
+/*
+ * Windows run their own zoom-rect animation (see Window.astro); anything else marked data-reveal rises into place.
+ * Hidden only once the inline script has flagged JS, so no-JS visitors still see everything.
+ */
+.js [data-reveal]:not(.window-shell, .is-visible) {
+	visibility: hidden;
+}
+
+.js [data-reveal].is-visible:not(.window-shell) {
+	animation: rise 0.4s steps(4) both;
+}
+
+@keyframes rise {
+	from {
+		translate: 0 24px;
+		opacity: 0.4;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.js [data-reveal]:not(.window-shell) {
+		visibility: visible;
+		animation: none;
+	}
+
+	html {
+		scroll-behavior: auto;
+	}
+}
+
+/* ---- Irregular edges ---- */
+
+/*
+ * A strip filled with --edge-color below a smooth wavy line, laid over a straight colour boundary.
+ * The mask tiles are 64x8 dots and the line dips to about dot row 6, so put that row on the boundary.
+ */
+.pixel-edge {
+	position: absolute;
+	left: 0;
+	right: 0;
+	height: calc(8 * var(--dot));
+	background: var(--edge-color);
+	-webkit-mask: url('/pixel/edge-a.svg') 0 0 / calc(64 * var(--dot)) calc(8 * var(--dot)) repeat-x;
+	mask: url('/pixel/edge-a.svg') 0 0 / calc(64 * var(--dot)) calc(8 * var(--dot)) repeat-x;
+	pointer-events: none;
+}
+
+.pixel-edge--b {
+	-webkit-mask-image: url('/pixel/edge-b.svg');
+	mask-image: url('/pixel/edge-b.svg');
+}
+
+.pixel-edge--line-b {
+	-webkit-mask-image: url('/pixel/edge-b-line.svg');
+	mask-image: url('/pixel/edge-b-line.svg');
+}
+
+.pixel-edge--down {
+	transform: scaleY(-1);
+}
+
+/* ---- Page column ---- */
+
+/* The column of windows. Windows alternate slightly left and right, like a scattered desktop. */
+.page {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 96px;
+	max-width: 1040px;
+	margin: 0 auto;
+	padding: 96px 16px 64px;
+}
+
+.page .window--left {
+	margin-right: 8%;
+}
+
+.page .window--right {
+	margin-left: 8%;
+}
+
+@media (max-width: 640px) {
+	h1 {
+		font-size: 36px;
+		line-height: 48px;
+	}
+
+	.page {
+		gap: 64px;
+	}
+
+	.page .window--left,
+	.page .window--right {
+		margin: 0;
+	}
+}

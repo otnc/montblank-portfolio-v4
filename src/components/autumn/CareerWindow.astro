@@ -1,0 +1,81 @@
+---
+import Window from '@/components/autumn/Window.astro';
+import { career, careerCategoryLabels } from '@/data/profile';
+---
+
+<Window title="career.log" class="window--left">
+	<h2>Career</h2>
+	<ol class="timeline">
+		{
+			career.map((item) => (
+				<li class={`timeline__item timeline__item--${item.category}`}>
+					<p class="timeline__head">
+						<time>{item.date}</time>
+						<span class="timeline__category">{careerCategoryLabels[item.category]}</span>
+					</p>
+					<p>
+						{item.url ? (
+							<a href={item.url} target="_blank" rel="noreferrer">
+								{item.lines[0]}
+							</a>
+						) : (
+							item.lines[0]
+						)}
+						{item.lines.slice(1).map((line) => (
+							<>
+								<br />
+								{line}
+							</>
+						))}
+					</p>
+				</li>
+			))
+		}
+	</ol>
+</Window>
+
+<style>
+	.timeline {
+		display: grid;
+		gap: 16px;
+		margin-top: 8px;
+		padding-left: 24px;
+		border-left: 3px solid var(--ink);
+	}
+
+	.timeline__item {
+		position: relative;
+	}
+
+	/* A square dot on the line for each entry. */
+	.timeline__item::before {
+		content: '';
+		position: absolute;
+		left: -33px;
+		top: 9px;
+		width: 12px;
+		height: 12px;
+		background: var(--marker, var(--marron));
+		outline: 3px solid var(--ink);
+	}
+
+	.timeline__item--award {
+		--marker: var(--ginkgo);
+	}
+
+	.timeline__item--project {
+		--marker: var(--maple);
+	}
+
+	.timeline__head {
+		display: flex;
+		gap: 12px;
+		color: var(--muted);
+	}
+
+	.timeline__category {
+		padding: 0 6px;
+		background: var(--marron-light);
+		color: var(--ink);
+	}
+</style>
