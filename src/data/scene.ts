@@ -7,8 +7,6 @@ export const scene = {
 	ropeway: '#2a1a2a',
 	town: ['#4a2f40', '#3b2738', '#5a3448'],
 	light: '#ffd27a',
-	// Motomachi landmarks at the foot of the mountain.
-	church: { wall: '#e8dcc8', dome: '#5a8a7a', roof: '#4a3040' },
 	brick: ['#b4503a', '#9a3a2a', '#7a2c20'],
 	brickRoof: '#3a2a30',
 	water: ['#9a6a8e', '#7d5c88', '#6c5888', '#56497a', '#423a68', '#2e2a50'],

@@ -1,6 +1,6 @@
 ---
 /**
- * The bay area at dusk, along the bottom of the hero: Mt. Hakodate with its ropeway, the roofs and churches of Motomachi
+ * The bay area at dusk, along the bottom of the hero: Mt. Hakodate with its ropeway, the roofs of Motomachi
  * at its foot, and the Kanemori red brick warehouses along the water, split by the canal and its bridge.
  * The sky above is transparent so the hero's sky shows through; the water at the bottom carries on as the page background.
  */
@@ -44,7 +44,7 @@ for (let step = 0; step <= cableSteps; step += 1) {
 }
 g.rect(BASE.x - 2, BASE.y, 6, 6, scene.ropeway);
 
-// Motomachi: rooftops at the foot, with the Orthodox church's green domes and the Catholic church's spire.
+// Motomachi: rooftops at the foot of the mountain.
 const windows: { x: number; y: number; delay: string }[] = [];
 for (let x = 0; x < W; ) {
 	const width = 4 + Math.floor(rand() * 8);
@@ -54,17 +54,6 @@ for (let x = 0; x < W; ) {
 	for (let wx = x + 1; wx < x + width - 1; wx += 2) if (rand() < 0.3) windows.push({ x: wx, y: TOWN - height + 2, delay: (rand() * 6).toFixed(2) });
 	x += width;
 }
-const ORTHODOX = CX - 150;
-g.rect(ORTHODOX - 6, TOWN - 12, 12, 12, scene.church.wall);
-g.rect(ORTHODOX - 3, TOWN - 18, 6, 6, scene.church.wall);
-g.disc(ORTHODOX, TOWN - 19, 3, () => scene.church.dome);
-g.rect(ORTHODOX, TOWN - 25, 1, 3, scene.church.dome);
-g.disc(ORTHODOX - 6, TOWN - 13, 2, () => scene.church.dome);
-g.disc(ORTHODOX + 5, TOWN - 13, 2, () => scene.church.dome);
-const CATHOLIC = CX - 108;
-g.rect(CATHOLIC - 4, TOWN - 10, 8, 10, scene.church.wall);
-g.rect(CATHOLIC - 2, TOWN - 18, 4, 8, scene.church.wall);
-for (let y = 0; y < 6; y += 1) g.rect(CATHOLIC - Math.floor(y / 3), TOWN - 24 + y, 1 + Math.floor(y / 3) * 2, 1, scene.church.roof);
 
 // The Kanemori warehouses: long brick halls with low gabled roofs and arched doors, the canal and its bridge between them.
 const CANAL = { x: CX + 70, w: 24 };
