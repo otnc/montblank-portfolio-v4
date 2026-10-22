@@ -10,6 +10,7 @@ import HarborLife from '@/components/dusk/HarborLife.astro';
 import StonePath from '@/components/dusk/StonePath.astro';
 import Header from '@/components/dusk/Header.astro';
 import { SITE_ORIGIN, profile } from '@/data/profile';
+import { spriteSvg } from '@/lib/pixel-grid';
 
 interface Props {
 	title: string;
@@ -20,7 +21,8 @@ interface Props {
 
 const { title, description, path } = Astro.props;
 const url = `${SITE_ORIGIN}${path}`;
-const thisYear = new Date().getFullYear();
+// PixelMplus draws the copyright sign as an unreadable squiggle, so it is drawn here in 3px dots instead.
+const copyrightSign = spriteSvg(['.ccccc.', 'c.....c', 'c.ccc.c', 'c.c...c', 'c.ccc.c', 'c.....c', '.ccccc.'], { c: '#fff4e2' });
 ---
 
 <!doctype html>
@@ -76,14 +78,11 @@ const thisYear = new Date().getFullYear();
 
 			<footer class="footer">
 				<div class="footer__quay">
-					<section aria-labelledby="contact-heading">
+					<p class="footer__copyright"><Fragment set:html={copyrightSign} /><span class="visually-hidden">&copy;</span>{profile.name}</p>
+					<section class="footer__contact" aria-labelledby="contact-heading">
 						<h2 id="contact-heading">Contact</h2>
 						<a href={`mailto:${profile.email}`}>{profile.email}</a>
 					</section>
-					<p class="footer__meta">
-						<span>{profile.since} - {thisYear}</span>
-						<span>(c) {profile.name} - All rights reserved.</span>
-					</p>
 				</div>
 			</footer>
 		</div>
@@ -138,15 +137,13 @@ const thisYear = new Date().getFullYear();
 		color: var(--cream);
 	}
 
-	.footer__meta {
-		display: grid;
-		justify-items: end;
-		color: #c9b8a8;
+	.footer__contact {
+		text-align: right;
 	}
 
-	@media (max-width: 640px) {
-		.footer__meta {
-			justify-items: start;
-		}
+	.footer__copyright {
+		display: flex;
+		align-items: center;
+		gap: 6px;
 	}
 </style>
