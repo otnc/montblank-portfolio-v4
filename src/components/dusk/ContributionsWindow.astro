@@ -1,6 +1,6 @@
 ---
-import LanguageBar from '@/components/autumn/LanguageBar.astro';
-import Window from '@/components/autumn/Window.astro';
+import LanguageBar from '@/components/dusk/LanguageBar.astro';
+import Window from '@/components/dusk/Window.astro';
 import { formatCompact } from '@/lib/format';
 import type { Contribution } from '@/lib/github';
 
@@ -55,7 +55,18 @@ const { contributions } = Astro.props;
 		flex-wrap: wrap;
 		justify-content: space-between;
 		gap: 0 16px;
+		padding: 2px 8px;
 		color: var(--ink);
+		text-decoration: none;
+	}
+
+	.repo:hover,
+	.repo:focus-visible {
+		background: var(--marron-light);
+	}
+
+	.repo__name {
+		text-decoration: underline;
 	}
 
 	.repo__name {

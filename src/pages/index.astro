@@ -1,43 +1,43 @@
 ---
-import BlogWindow from '@/components/autumn/BlogWindow.astro';
-import CareerWindow from '@/components/autumn/CareerWindow.astro';
-import ContributionsWindow from '@/components/autumn/ContributionsWindow.astro';
-import CrossLinksWindow from '@/components/autumn/CrossLinksWindow.astro';
-import GithubWindow from '@/components/autumn/GithubWindow.astro';
-import Marquee from '@/components/autumn/Marquee.astro';
-import OtherSelf from '@/components/autumn/OtherSelf.astro';
-import ProfileWindow from '@/components/autumn/ProfileWindow.astro';
-import WorksWindow from '@/components/autumn/WorksWindow.astro';
-import AutumnLayout from '@/layouts/AutumnLayout.astro';
+import AboutWindow from '@/components/dusk/AboutWindow.astro';
+import BlogWindow from '@/components/dusk/BlogWindow.astro';
+import CareerWindow from '@/components/dusk/CareerWindow.astro';
+import ContributionsWindow from '@/components/dusk/ContributionsWindow.astro';
+import CrossLinksWindow from '@/components/dusk/CrossLinksWindow.astro';
+import GithubWindow from '@/components/dusk/GithubWindow.astro';
+import Hero from '@/components/dusk/Hero.astro';
+import Marquee from '@/components/dusk/Marquee.astro';
+import TramStop from '@/components/dusk/TramStop.astro';
+import WorksWindow from '@/components/dusk/WorksWindow.astro';
+import DuskLayout from '@/layouts/DuskLayout.astro';
 import { profile } from '@/data/profile';
 import { orNull } from '@/lib/cache';
 import { getPosts } from '@/lib/feeds';
 import { getContributions, getGithubStats, getWorks } from '@/lib/github';
 
-// The GraphQL API rejects anonymous calls, so without the Pages secret the GitHub sections show a notice instead.
+// Optional Pages secret: with it GitHub is read through GraphQL, without it through the token-less sources (see src/lib/github-public.ts).
 const githubToken = Astro.locals.runtime?.env?.GITHUB_TOKEN;
-const withToken = <T,>(load: (token: string) => Promise<T>) =>
-	githubToken ? orNull(load(githubToken)) : Promise.resolve(null);
 
 const [stats, works, contributions, posts] = await Promise.all([
-	withToken((token) => getGithubStats(token, profile.handle)),
-	withToken((token) => getWorks(token, profile.handle)),
-	withToken((token) => getContributions(token, profile.handle)),
+	orNull(getGithubStats(githubToken, profile.handle)),
+	orNull(getWorks(githubToken, profile.handle)),
+	orNull(getContributions(githubToken, profile.handle)),
 	orNull(getPosts()),
 ]);
 ---
 
-<AutumnLayout path="/" title={`${profile.name}のポートフォリオ`} description={profile.bio}>
-	<Marquee messages={profile.messages} />
+<DuskLayout path="/" title={`${profile.name}のポートフォリオ`} description={profile.bio}>
+	<Hero slot="hero" />
+	<Marquee slot="hero" messages={profile.messages} />
 
 	<main id="main" class="page">
-		<ProfileWindow />
-		<GithubWindow stats={stats} />
-		<CareerWindow />
-		<CrossLinksWindow />
+		<AboutWindow />
 		<BlogWindow posts={posts} />
+		<GithubWindow stats={stats} />
 		<WorksWindow works={works} />
 		<ContributionsWindow contributions={contributions} />
-		<OtherSelf />
+		<CareerWindow />
+		<CrossLinksWindow />
+		<TramStop />
 	</main>
-</AutumnLayout>
+</DuskLayout>

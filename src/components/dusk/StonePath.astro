@@ -1,0 +1,73 @@
+---
+/**
+ * A stone-paved path down the middle of the harbour, under the column of windows, paved like Hachiman-zaka:
+ * irregular, many-sided grey flagstones with dark joints and one straight strip of stone down the centre,
+ * with a granite kerb on each side where the water begins. It darkens toward the bottom along with the water.
+ */
+import { Grid, gridSvg, random } from '@/lib/pixel-grid';
+
+const TILE_W = 96;
+const TILE_H = 64;
+const STONES = ['#8e8a94', '#84808c', '#98949c', '#7c7884', '#8a8590'];
+const JOINT = '#5a5660';
+const rand = random(1879);
+
+// Flagstones are the cells of a Voronoi diagram over seeds that wrap around the tile, so the tile repeats without seams.
+const seeds = Array.from({ length: 28 }, () => ({ x: rand() * TILE_W, y: rand() * TILE_H, color: STONES[Math.floor(rand() * STONES.length)] }));
+const wrapped = (a: number, b: number, size: number) => {
+	const d = Math.abs(a - b);
+	return Math.min(d, size - d);
+};
+const g = new Grid(TILE_W, TILE_H);
+for (let y = 0; y < TILE_H; y += 1) {
+	for (let x = 0; x < TILE_W; x += 1) {
+		let nearest = { d: Infinity, color: '' };
+		let second = Infinity;
+		for (const seed of seeds) {
+			const d = Math.hypot(wrapped(x + 0.5, seed.x, TILE_W), wrapped(y + 0.5, seed.y, TILE_H));
+			if (d < nearest.d) {
+				second = nearest.d;
+				nearest = { d, color: seed.color };
+			} else if (d < second) second = d;
+		}
+		g.set(x, y, second - nearest.d < 1.1 ? JOINT : nearest.color);
+	}
+}
+const svg = gridSvg(g).replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ');
+const tile = `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+---
+
+<div class="path" aria-hidden="true" style={`--tile:${tile};--tile-w:${TILE_W * 3}px;--tile-h:${TILE_H * 3}px`}>
+	<span class="path__centre"></span>
+</div>
+
+<style>
+	.path {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 50%;
+		width: min(1100px, 100%);
+		translate: -50% 0;
+		background:
+			linear-gradient(transparent 0 25%, #2a1a3026 25% 50%, #2a1a3048 50% 75%, #1d142070 75% 100%),
+			var(--tile) 0 0 / var(--tile-w) var(--tile-h) repeat;
+		/* Granite kerbs, then the quay edge dropping to the water. */
+		border-inline: 12px solid #b8aca6;
+		box-shadow:
+			-9px 0 0 #3e3448,
+			9px 0 0 #3e3448;
+	}
+
+	/* The straight strip of stone running down the middle of the slope, in short slabs. */
+	.path__centre {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 50%;
+		width: 18px;
+		translate: -50% 0;
+		background: repeating-linear-gradient(#a8a2a6 0 45px, #4e4a54 45px 48px);
+		border-inline: 3px solid #4e4a54;
+	}
+</style>

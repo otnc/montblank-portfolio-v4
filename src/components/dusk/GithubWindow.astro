@@ -1,6 +1,6 @@
 ---
-import LanguageBar from '@/components/autumn/LanguageBar.astro';
-import Window from '@/components/autumn/Window.astro';
+import LanguageBar from '@/components/dusk/LanguageBar.astro';
+import Window from '@/components/dusk/Window.astro';
 import { profile } from '@/data/profile';
 import { formatCount } from '@/lib/format';
 import type { GithubStats } from '@/lib/github';
@@ -16,7 +16,7 @@ const peak = stats ? Math.max(1, ...stats.recentDays.map((day) => day.count)) : 
 const GRAPH_DOTS = 24;
 ---
 
-<Window title={`github.com/${profile.handle}`} class="window--right">
+<Window title={`github.com/${profile.handle}`} class="window--left">
 	<h2>GitHub</h2>
 	{
 		stats ? (
@@ -41,7 +41,7 @@ const GRAPH_DOTS = 24;
 				</dl>
 
 				<h3>言語</h3>
-				<LanguageBar languages={stats.languages} labelled={8} />
+				<LanguageBar languages={stats.languages} labelled={stats.languages.length} />
 
 				<h3 class="graph-heading">直近31日間のコミット数</h3>
 				<ol class="graph" style={`--graph-dots:${GRAPH_DOTS}`}>

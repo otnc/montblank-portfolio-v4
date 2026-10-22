@@ -1,0 +1,199 @@
+---
+/**
+ * The way to otoneko.cat, the counterpart of its bottle mail. On the tramway street along the quay, a Hakodate city tram
+ * pulls in at the stop from the left.
+ * The tram is modelled on car 812 of the 800 series, the one kept in the old standard "sasa-iro two-tone" livery:
+ * ivory above, bamboo green below, two-leaf doors at the front and in the middle.
+ * The street closes the harbour, so this is the last thing on the page.
+ */
+import { otherSelf } from '@/data/profile';
+import { scene } from '@/data/scene';
+import { Grid, gridSvg } from '@/lib/pixel-grid';
+
+const W = 96;
+const H = 40;
+const g = new Grid(W, H);
+const { upper, lower, band, ink, glass } = scene.tram;
+
+// The pantograph in the middle of the roof.
+for (let index = 0; index < 4; index += 1) {
+	g.set(30 + index, 7 - index, ink);
+	g.set(40 - index, 7 - index, ink);
+}
+g.rect(32, 3, 7, 1, ink);
+g.rect(4, 9, 88, 2, ink);
+// Body: ivory upper half, bamboo green lower half, a darker line between.
+g.rect(1, 10, 94, 25, ink);
+g.rect(2, 11, 92, 12, upper);
+g.rect(2, 23, 92, 11, lower);
+g.rect(2, 22, 92, 1, band);
+// Two-leaf doors in the middle and at the front, side windows, and the front end's window and headlight.
+for (const doorX of [40, 78]) {
+	g.rect(doorX, 13, 11, 21, ink);
+	g.rect(doorX + 1, 14, 4, 7, glass);
+	g.rect(doorX + 6, 14, 4, 7, glass);
+	g.rect(doorX + 1, 22, 4, 12, band);
+	g.rect(doorX + 6, 22, 4, 12, band);
+}
+for (const x of [4, 13, 22, 31, 53, 62]) {
+	g.rect(x, 13, 8, 8, ink);
+	g.rect(x + 1, 14, 6, 6, glass);
+	g.rect(x + 1, 14, 6, 1, '#e8b860');
+}
+g.rect(91, 12, 3, 10, ink);
+g.rect(92, 13, 2, 8, glass);
+g.rect(91, 26, 3, 3, '#fff1c4');
+// Bogies and wheels.
+for (const bx of [10, 66]) {
+	g.rect(bx, 34, 18, 2, ink);
+	g.disc(bx + 4, 37, 3, (dx, dy, d) => (d < 1 ? '#5a4a4a' : '#1a1212'));
+	g.disc(bx + 14, 37, 3, (dx, dy, d) => (d < 1 ? '#5a4a4a' : '#1a1212'));
+}
+const tram = gridSvg(g, 'tram__art');
+---
+
+<section class="stop" data-reveal>
+	<div class="stop__letter">
+		<h2>もうひとりのわたし</h2>
+		<p>{otherSelf.summary}</p>
+		<div class="stop__actions">
+			<a class="pixel-button pixel-button--cream" href={otherSelf.twitter.url} target="_blank" rel="noreferrer">Twitter {otherSelf.twitter.handle}</a>
+			<a class="pixel-button" href={otherSelf.site.url} target="_blank" rel="noreferrer">{otherSelf.site.label} へ</a>
+		</div>
+	</div>
+	<div class="stop__street" aria-hidden="true">
+		<span class="stop__pole"><span>電停</span></span>
+		<div class="tram" style={`--w:${W};--h:${H}`}>
+			<Fragment set:html={tram} />
+		</div>
+	</div>
+</section>
+
+<style>
+	.stop {
+		display: grid;
+		gap: 48px;
+	}
+
+	.stop__letter {
+		position: relative;
+		z-index: 1;
+		max-width: 720px;
+		padding: 24px;
+		background: var(--paper);
+		color: var(--ink);
+		border: 5px solid var(--ink);
+		border-image: var(--pixel-corner-ink) 3 / 2 / 2 stretch;
+		background-clip: padding-box;
+		filter: drop-shadow(9px 9px 0 #00000055);
+	}
+
+	.stop__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 16px;
+		margin-top: 16px;
+	}
+
+	/* The quay wall of stone blocks, then the tramway street: asphalt, two rails, a kerb on the far side. */
+	.stop__street {
+		position: relative;
+		height: 177px;
+		border-top: 24px solid;
+		border-image: repeating-linear-gradient(90deg, #6a5a60 0 45px, #3e3238 45px 48px) 24;
+		margin-inline: calc(50% - 50vw);
+		background: linear-gradient(
+			#c0a898 0 6px,
+			#3a2a2e 6px 147px,
+			#1e1418 147px 150px,
+			#5e5058 150px 153px,
+			#3a2a2e 153px 159px,
+			#1e1418 159px 162px,
+			#5e5058 162px 165px,
+			#3a2a2e 165px 171px,
+			#c0a898 171px 177px
+		);
+		overflow: hidden;
+	}
+
+	.tram {
+		position: absolute;
+		left: calc(50% - 200px);
+		bottom: 12px;
+		width: calc(var(--w) * 3px);
+		height: calc(var(--h) * 3px);
+		filter: drop-shadow(6px 6px 0 #00000055);
+	}
+
+	.tram :global(.tram__art) {
+		display: block;
+	}
+
+	/* Pulls in from the left in hard steps the first time it is seen, then idles. */
+	:global(.js) .stop:not(.is-visible) .tram {
+		visibility: hidden;
+	}
+
+	:global(.js) .stop.is-visible .tram {
+		animation:
+			arrive 2.4s steps(24) both,
+			idle 0.8s steps(1) 2.4s infinite;
+	}
+
+	@keyframes arrive {
+		from {
+			translate: calc(-50vw - 320px) 0;
+		}
+	}
+
+	@keyframes idle {
+		50% {
+			translate: 0 -3px;
+		}
+	}
+
+	/* The stop sign: a pole with a plate. */
+	.stop__pole {
+		position: absolute;
+		left: calc(50% + 140px);
+		bottom: 30px;
+		width: 6px;
+		height: 108px;
+		background: #2b1d1d;
+	}
+
+	.stop__pole span {
+		position: absolute;
+		left: -24px;
+		top: -12px;
+		width: 54px;
+		padding: 3px 0;
+		background: #fff4e2;
+		color: #3f8a5a;
+		font-size: 20px;
+		line-height: 24px;
+		text-align: center;
+		outline: 3px solid #2b1d1d;
+	}
+
+	@media (max-width: 640px) {
+		.tram {
+			left: 8px;
+		}
+
+		.stop__pole {
+			left: auto;
+			right: 32px;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.tram {
+			animation: none !important;
+		}
+
+		:global(.js) .stop .tram {
+			visibility: visible;
+		}
+	}
+</style>

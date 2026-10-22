@@ -1,0 +1,155 @@
+---
+// Things in the evening sky: drifting clouds, the first star of the evening and crows flying home.
+import { spriteSvg } from '@/lib/pixel-grid';
+
+const CLOUD = ['....hhhhhhhh........', '..hhhhhhhhhhhhhh....', 'ssssssssssssssssssss'];
+const CLOUD_LONG = ['......hhhhhhhhhhhh..........', 'hhhhhhhhhhhhhhhhhhhhhhhhhh..', '..ssssssssssssssssssssssssss'];
+const clouds = [
+	{ svg: spriteSvg(CLOUD_LONG, { h: '#f3b07c', s: '#c56f6c' }), top: 34, duration: 140, delay: -20 },
+	{ svg: spriteSvg(CLOUD, { h: '#f6c48a', s: '#d98466' }), top: 50, duration: 100, delay: -70 },
+	{ svg: spriteSvg(CLOUD, { h: '#ab5a74', s: '#7e4670' }), top: 14, duration: 180, delay: -110 },
+	{ svg: spriteSvg(CLOUD_LONG, { h: '#c96a70', s: '#9c4c6a' }), top: 24, duration: 160, delay: -40 },
+];
+const CROW_UP = ['k.....k', '.k...k.', '..kkk..'];
+const CROW_DOWN = ['.......', 'kkkkkkk', '..kkk..'];
+const crow = [spriteSvg(CROW_UP, { k: '#2a1a24' }), spriteSvg(CROW_DOWN, { k: '#2a1a24' })];
+const flock = [
+	[0, 0],
+	[-27, 15],
+	[-54, 30],
+	[24, 21],
+];
+---
+
+<div class="sky" aria-hidden="true">
+	<span class="evening-star"></span>
+	{clouds.map((cloud) => <span class="cloud" style={`top:${cloud.top}%;--duration:${cloud.duration}s;--delay:${cloud.delay}s`} set:html={cloud.svg} />)}
+	<span class="flock">
+		{
+			flock.map(([x, y], index) => (
+				<span class="crow" style={`left:${x}px;top:${y}px;--delay:${-index * 0.15}s`}>
+					<span class="crow__up" set:html={crow[0]} />
+					<span class="crow__down" set:html={crow[1]} />
+				</span>
+			))
+		}
+	</span>
+</div>
+
+<style>
+	.sky {
+		position: absolute;
+		inset: 0;
+		overflow: hidden;
+		pointer-events: none;
+	}
+
+	.sky > span {
+		position: absolute;
+	}
+
+	.sky :global(svg) {
+		display: block;
+	}
+
+	/* The first star: a 3x3 cross that twinkles. */
+	.evening-star {
+		left: 18%;
+		top: 9%;
+		width: 3px;
+		height: 3px;
+		background: #fff4e2;
+		box-shadow:
+			3px 0 #fff4e2aa,
+			-3px 0 #fff4e2aa,
+			0 3px #fff4e2aa,
+			0 -3px #fff4e2aa;
+		animation: twinkle 3s steps(1) infinite;
+	}
+
+	@keyframes twinkle {
+		40% {
+			box-shadow: none;
+		}
+		60% {
+			box-shadow:
+				3px 0 #fff4e2aa,
+				-3px 0 #fff4e2aa,
+				0 3px #fff4e2aa,
+				0 -3px #fff4e2aa;
+		}
+	}
+
+	.cloud {
+		left: 0;
+		animation: drift var(--duration) steps(320) var(--delay) infinite;
+	}
+
+	@keyframes drift {
+		from {
+			transform: translateX(-120px);
+		}
+		to {
+			transform: translateX(100vw);
+		}
+	}
+
+	/* A small flock crosses now and then, flapping on two frames. */
+	.flock {
+		left: 0;
+		top: 22%;
+		animation: flock 26s steps(260) -6s infinite;
+	}
+
+	@keyframes flock {
+		0% {
+			transform: translate(calc(100vw + 60px), 0);
+		}
+		55%,
+		100% {
+			transform: translate(-120px, -60px);
+		}
+	}
+
+	.crow {
+		position: absolute;
+	}
+
+	.crow__down {
+		position: absolute;
+		inset: 0;
+	}
+
+	.crow__up,
+	.crow__down {
+		animation: flap 0.5s steps(1) var(--delay) infinite;
+	}
+
+	.crow__down {
+		animation-name: flap-down;
+	}
+
+	@keyframes flap {
+		50% {
+			visibility: hidden;
+		}
+	}
+
+	@keyframes flap-down {
+		0%,
+		49% {
+			visibility: hidden;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.sky > span,
+		.crow span {
+			animation: none;
+		}
+
+		.flock {
+			display: none;
+		}
+	}
+</style>

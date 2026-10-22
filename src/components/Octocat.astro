@@ -1,0 +1,64 @@
+---
+import { octocat } from '@/data/pixel-icons';
+import { pixelPaths } from '@/lib/pixel-path';
+
+interface Props {
+	scale?: number;
+}
+
+const { scale = 6 } = Astro.props;
+const width = octocat.frames[0][0].length;
+const height = octocat.frames[0].length;
+---
+
+<svg
+	class="octocat"
+	width={width * scale}
+	height={height * scale}
+	viewBox={`0 0 ${width} ${height}`}
+	shape-rendering="crispEdges"
+	aria-hidden="true"
+>
+	{
+		octocat.frames.map((frame, index) => (
+			<g class={`octocat__frame octocat__frame--${index}`}>
+				{pixelPaths(frame, octocat.colors).map((path) => (
+					<path fill={path.fill} d={path.d} />
+				))}
+			</g>
+		))
+	}
+</svg>
+
+<style>
+	.octocat__frame--1 {
+		visibility: hidden;
+	}
+
+	.octocat__frame--0 {
+		animation: frame-a 0.5s steps(1) infinite;
+	}
+
+	.octocat__frame--1 {
+		animation: frame-b 0.5s steps(1) infinite;
+	}
+
+	@keyframes frame-a {
+		50% {
+			visibility: hidden;
+		}
+	}
+
+	@keyframes frame-b {
+		50% {
+			visibility: visible;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.octocat__frame--0,
+		.octocat__frame--1 {
+			animation: none;
+		}
+	}
+</style>

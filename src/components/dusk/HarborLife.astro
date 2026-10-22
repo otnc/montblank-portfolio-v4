@@ -1,0 +1,272 @@
+---
+/**
+ * What floats and flies over the harbour behind the windows: ripples catching the light, small boats near the top,
+ * squid-fishing boats with their strings of lamps lower down where night has fallen, blinking buoys and passing gulls.
+ * Positions are percentages of the page height, so they spread over any length of content.
+ */
+import { random, spriteSvg } from '@/lib/pixel-grid';
+
+const rand = random(410);
+
+const ripples = Array.from({ length: 70 }, () => ({
+	left: Math.round(rand() * 100),
+	top: Math.round(rand() * 1000) / 10,
+	width: (2 + Math.floor(rand() * 4)) * 3,
+	delay: (-rand() * 2).toFixed(2),
+}));
+
+const BOAT = ['.....m.....', '.....m.....', '....ccc....', '..wwwwwww..', 'hhhhhhhhhhh', '.hhhhhhhhh.'];
+const boat = spriteSvg(BOAT, { m: '#3a2e3a', c: '#e8dcc8', w: '#f4ece0', h: '#2f5a9a' });
+// A squid-fishing boat: a white hull, a cabin and the wire its lamps hang from (the lamps are drawn separately so they can glow).
+const SQUID = [
+	'...k..........k..........k...',
+	'.kkkkkkkkkkkkkkkkkkkkkkkkkkk.',
+	'...k..........k..........k...',
+	'...k..........k.....wwww.k...',
+	'...k..........k....wwwwww....',
+	'...k..........k....wnwnww....',
+	'hhhhhhhhhhhhhhhhhhhhhhhhhhhhh',
+	'.bbbbbbbbbbbbbbbbbbbbbbbbbbb.',
+	'..bbbbbbbbbbbbbbbbbbbbbbbbb..',
+	'...bbbbbbbbbbbbbbbbbbbbbbb...',
+];
+const squid = spriteSvg(SQUID, { k: '#1a1622', w: '#e8dcc8', n: '#ffd27a', h: '#f4ece0', b: '#3a4a7a' });
+// A tile of small wave marks scattered over the water, drifted slowly by CSS.
+const WAVE_TILE = [
+	'................................',
+	'...ww.................ww........',
+	'..w..w...............w..w.......',
+	'................................',
+	'................................',
+	'..........ww....................',
+	'.........w..w...................',
+	'................................',
+];
+const waveSvg = spriteSvg(WAVE_TILE, { w: '#ffffff' }).replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ');
+const waveTile = `url("data:image/svg+xml,${encodeURIComponent(waveSvg)}")`;
+const boats = [
+	{ left: 12, top: 6, duration: 70, delay: -10 },
+	{ left: 70, top: 16, duration: 90, delay: -50 },
+];
+const squidBoats = [
+	{ left: 4, top: 62 },
+	{ left: 82, top: 70 },
+	{ left: 14, top: 84 },
+	{ left: 74, top: 92 },
+];
+const buoys = [
+	{ left: 3, top: 30, color: '#e0573a' },
+	{ left: 95, top: 44, color: '#6fbf73' },
+	{ left: 6, top: 52, color: '#e0573a' },
+];
+const GULL = [spriteSvg(['w.....w', '.w...w.', '..www..'], { w: '#f4ece0' }), spriteSvg(['.......', 'wwwwwww', '..www..'], { w: '#f4ece0' })];
+---
+
+<div class="life" aria-hidden="true" style={`--wave-tile:${waveTile}`}>
+	{ripples.map((r) => <span class="ripple" style={`left:${r.left}%;top:${r.top}%;width:${r.width}px;--delay:${r.delay}s`} />)}
+	{
+		boats.map((b) => (
+			<span class="boat" style={`left:${b.left}%;top:${b.top}%;--duration:${b.duration}s;--delay:${b.delay}s`}>
+				<span class="bob" set:html={boat} />
+			</span>
+		))
+	}
+	{
+		squidBoats.map((b, index) => (
+			<span class="squid" style={`left:${b.left}%;top:${b.top}%;--delay:${-index * 0.7}s`}>
+				<span class="bob">
+					<Fragment set:html={squid} />
+					<span class="squid__lamps" />
+				</span>
+			</span>
+		))
+	}
+	{buoys.map((b, index) => <span class="buoy" style={`left:${b.left}%;top:${b.top}%;--color:${b.color};--delay:${index * 0.5}s`} />)}
+	<div class="gull-layer">
+		{
+			[0, 1].map((index) => (
+				<span class="gull" style={`top:${18 + index * 30}%;--duration:${22 + index * 9}s;--delay:${-index * 11}s`}>
+					<span class="gull__a" set:html={GULL[0]} />
+					<span class="gull__b" set:html={GULL[1]} />
+				</span>
+			))
+		}
+	</div>
+</div>
+
+<style>
+	/* clip, not hidden: hidden would make this the scroll container and stop the sticky gull layer. */
+	.life {
+		position: absolute;
+		inset: 0;
+		overflow: clip;
+		pointer-events: none;
+	}
+
+	.life > span {
+		position: absolute;
+	}
+
+	.life :global(svg) {
+		display: block;
+	}
+
+	/* Small wave marks all over the water, drifting sideways in hard steps. */
+	.life::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: var(--wave-tile) 0 0 / 96px 24px repeat;
+		opacity: 0.12;
+		animation: waves 12s steps(32) infinite;
+	}
+
+	@keyframes waves {
+		to {
+			background-position: 96px 0;
+		}
+	}
+
+	/* Light on the water: a dash that wobbles sideways. */
+	.ripple {
+		height: 3px;
+		background: #ffffff40;
+		animation: wobble 1.4s steps(2) var(--delay) infinite alternate;
+	}
+
+	@keyframes wobble {
+		to {
+			translate: 6px 0;
+		}
+	}
+
+	.boat {
+		animation: drift var(--duration) steps(300) var(--delay) infinite alternate;
+	}
+
+	@keyframes drift {
+		to {
+			translate: 30vw 0;
+		}
+	}
+
+	.bob {
+		display: block;
+		position: relative;
+		animation: bob 2s steps(2) infinite;
+	}
+
+	@keyframes bob {
+		50% {
+			translate: 0 3px;
+		}
+	}
+
+	.squid .bob {
+		animation-delay: var(--delay);
+	}
+
+	/* The fishing lamps: a row of bright bulbs under the wire, with a halo on the water around them. */
+	.squid__lamps {
+		position: absolute;
+		left: 9px;
+		top: 6px;
+		width: 69px;
+		height: 6px;
+		background: repeating-linear-gradient(90deg, #fff6d0 0 3px, transparent 3px 9px);
+		box-shadow:
+			0 0 0 6px #ffe7a033,
+			0 0 0 15px #ffe7a01a;
+		animation: lamps 3s steps(1) var(--delay) infinite;
+	}
+
+	@keyframes lamps {
+		50% {
+			background: repeating-linear-gradient(90deg, transparent 0 3px, #fff6d0 3px 6px, transparent 6px 9px);
+		}
+	}
+
+	.buoy {
+		width: 9px;
+		height: 12px;
+		background: var(--color);
+		outline: 3px solid #1a1622;
+		animation:
+			bob 2.4s steps(2) var(--delay) infinite,
+			flash 2s steps(1) var(--delay) infinite;
+	}
+
+	@keyframes flash {
+		50% {
+			box-shadow: 0 -9px 0 -3px #fff6d0;
+		}
+	}
+
+	/* Gulls keep crossing wherever you are on the page. */
+	.gull-layer {
+		position: sticky;
+		top: 0;
+		height: 100vh;
+	}
+
+	.gull {
+		position: absolute;
+		left: 0;
+		animation: fly var(--duration) steps(220) var(--delay) infinite;
+	}
+
+	@keyframes fly {
+		from {
+			transform: translateX(-40px);
+		}
+		to {
+			transform: translateX(100vw);
+		}
+	}
+
+	.gull__b {
+		position: absolute;
+		inset: 0;
+	}
+
+	.gull__a,
+	.gull__b {
+		animation: flap 0.6s steps(1) infinite;
+	}
+
+	.gull__b {
+		animation-name: flap-b;
+	}
+
+	@keyframes flap {
+		50% {
+			visibility: hidden;
+		}
+	}
+
+	@keyframes flap-b {
+		0%,
+		49% {
+			visibility: hidden;
+		}
+	}
+
+	@media (max-width: 1100px) {
+		.squid,
+		.buoy {
+			display: none;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.life *,
+		.life::before,
+		.life > span {
+			animation: none !important;
+		}
+
+		.gull-layer {
+			display: none;
+		}
+	}
+</style>

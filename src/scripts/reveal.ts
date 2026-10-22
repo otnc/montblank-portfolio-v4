@@ -1,4 +1,4 @@
-/** Adds `is-visible` to every `[data-reveal]` element the first time it scrolls into view. */
+/** Adds `is-visible` to every `[data-reveal]` and `[data-light]` element the first time it scrolls into view. */
 export function setupReveal() {
 	const observer = new IntersectionObserver(
 		(entries) => {
@@ -10,7 +10,7 @@ export function setupReveal() {
 		},
 		{ rootMargin: '0px 0px -10% 0px' },
 	);
-	document.querySelectorAll('[data-reveal]').forEach((element) => observer.observe(element));
+	document.querySelectorAll('[data-reveal], [data-light]').forEach((element) => observer.observe(element));
 }
 
 /** Toggles `is-paused` while each matched element is off screen; night.css pauses every animation inside it. */

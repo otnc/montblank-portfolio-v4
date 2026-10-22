@@ -22,23 +22,34 @@ import { profile, writingSites } from '@/data/profile';
 </header>
 
 <style>
+	/* Sits on the hero's sky. */
 	.header {
+		position: absolute;
+		top: 0;
+		left: 50%;
+		z-index: 2;
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
 		justify-content: space-between;
 		gap: 8px 24px;
-		max-width: 1040px;
-		margin: 0 auto;
+		width: 100%;
+		max-width: 1072px;
 		padding: 16px;
+		translate: -50% 0;
+	}
+
+	.header__logo,
+	.header__links a {
+		color: var(--cream) !important;
+		text-decoration: none;
+		text-shadow: 3px 3px 0 var(--ink);
 	}
 
 	.header__logo {
 		font-family: var(--font-heading);
 		font-size: 24px;
 		line-height: 36px;
-		color: var(--ink) !important;
-		text-decoration: none;
 	}
 
 	.header__links {
@@ -51,9 +62,11 @@ import { profile, writingSites } from '@/data/profile';
 		display: inline-flex;
 		align-items: center;
 		gap: 8px;
-		color: var(--ink);
-		text-decoration: none;
 		transition: transform 0.12s steps(2);
+	}
+
+	.header__links :global(.pixel-icon) {
+		filter: drop-shadow(3px 3px 0 var(--ink));
 	}
 
 	.header__links a:hover,

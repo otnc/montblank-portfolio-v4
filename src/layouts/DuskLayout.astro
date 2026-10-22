@@ -1,0 +1,146 @@
+---
+/**
+ * Shared frame for the bay at dusk: <head>, global styles, the header over the hero, the harbour water behind the sections
+ * and the quay with the footer at the bottom.
+ * Pages put the hero in the `hero` slot and their sections in the default slot.
+ */
+import '@/styles/pixelmplus.css';
+import '@/styles/dusk.css';
+import HarborLife from '@/components/dusk/HarborLife.astro';
+import StonePath from '@/components/dusk/StonePath.astro';
+import Header from '@/components/dusk/Header.astro';
+import { SITE_ORIGIN, profile } from '@/data/profile';
+
+interface Props {
+	title: string;
+	description: string;
+	/** Path of this page, used for the canonical URL. */
+	path: string;
+}
+
+const { title, description, path } = Astro.props;
+const url = `${SITE_ORIGIN}${path}`;
+const thisYear = new Date().getFullYear();
+---
+
+<!doctype html>
+<html lang="ja">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<meta name="theme-color" content="#4b3566" />
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<link rel="icon" href="/favicon.png" type="image/png" sizes="32x32" />
+		<link rel="canonical" href={url} />
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="montblank.fun" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={url} />
+		<meta property="og:locale" content="ja_JP" />
+		<meta property="og:image" content={`${SITE_ORIGIN}/thumbnail.png`} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:image:alt" content={profile.name} />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:creator" content={profile.twitter} />
+		<script is:inline>document.documentElement.classList.add('js');</script>
+		<link rel="preload" href="/fonts/pixelmplus/10-site.woff2" as="font" type="font/woff2" crossorigin />
+	</head>
+	<body>
+		<a class="skip-link" href="#main">本文へ</a>
+
+		<div class="site">
+			<Header />
+			<slot name="hero" />
+
+			<div class="harbor">
+				<!-- Wavy edges over the water's hard colour stops (25% / 50% / 75%): the harbour darkens into night as you scroll. -->
+				<div class="harbor__edges" aria-hidden="true">
+					<span class="pixel-edge pixel-edge--drift" style="--edge-color:#6c5888;top:calc(25% - 18px)"></span>
+					<span class="pixel-edge pixel-edge--b pixel-edge--drift" style="--edge-color:#56497a;top:calc(50% - 18px)"></span>
+					<span class="pixel-edge pixel-edge--drift" style="--edge-color:#423a68;top:calc(75% - 18px)"></span>
+				</div>
+				<HarborLife />
+				<StonePath />
+				<slot />
+			</div>
+
+			<footer class="footer">
+				<div class="footer__quay">
+					<section aria-labelledby="contact-heading">
+						<h2 id="contact-heading">Contact</h2>
+						<a href={`mailto:${profile.email}`}>{profile.email}</a>
+					</section>
+					<p class="footer__meta">
+						<span>{profile.since} - {thisYear}</span>
+						<span>(c) {profile.name} - All rights reserved.</span>
+					</p>
+				</div>
+			</footer>
+		</div>
+
+		<script>
+			import { pauseWhileOffscreen, setupReveal } from '@/scripts/reveal';
+
+			setupReveal();
+			pauseWhileOffscreen('.hero, .page, .footer, .marquee');
+		</script>
+	</body>
+</html>
+
+<style>
+	/* Continues the water at the bottom of BayView and darkens toward the quay. */
+	.harbor {
+		position: relative;
+		background: linear-gradient(#7d5c88 0 25%, #6c5888 25% 50%, #56497a 50% 75%, #423a68 75% 100%);
+	}
+
+	.harbor__edges {
+		position: absolute;
+		inset: 0;
+		overflow: hidden;
+		pointer-events: none;
+	}
+
+	/* The stone pavement of the quay, under the street lamps of the tramway street above. */
+	.footer {
+		background:
+			repeating-linear-gradient(90deg, transparent 0 27px, #1e181e 27px 30px),
+			repeating-linear-gradient(#2e2630 0 12px, #1e181e 12px 15px, #2a2230 15px 27px, #1e181e 27px 30px);
+	}
+
+	.footer__quay {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 16px 32px;
+		max-width: 1040px;
+		margin: 0 auto;
+		padding: 24px 16px 48px;
+		color: var(--cream);
+	}
+
+	.footer__quay h2 {
+		color: var(--ginkgo);
+	}
+
+	.footer__quay a {
+		color: var(--cream);
+	}
+
+	.footer__meta {
+		display: grid;
+		justify-items: end;
+		color: #c9b8a8;
+	}
+
+	@media (max-width: 640px) {
+		.footer__meta {
+			justify-items: start;
+		}
+	}
+</style>

@@ -1,0 +1,201 @@
+---
+import DuskSky from '@/components/dusk/DuskSky.astro';
+import FallingLeaves from '@/components/dusk/FallingLeaves.astro';
+import BayView from '@/components/dusk/BayView.astro';
+import Window from '@/components/dusk/Window.astro';
+import PixelIcon from '@/components/PixelIcon.astro';
+import { accounts, profile } from '@/data/profile';
+
+// The sub organisation shares GitHub's icon, so the hero shows each service once.
+const heroAccounts = accounts.filter((account, index) => accounts.findIndex((other) => other.icon === account.icon) === index);
+---
+
+<section class="hero">
+	<!-- Hard bands of dusk sky with wavy edges. The lower bands are measured from the bottom so they line up with the sunset behind BayView. -->
+	<div class="hero__edges" aria-hidden="true">
+		<span class="pixel-edge" style="--edge-color:#6e3f6c;top:calc(20% - 18px)"></span>
+		<span class="pixel-edge pixel-edge--b" style="--edge-color:#9c4c6a;top:calc(38% - 18px)"></span>
+		<span class="pixel-edge" style="--edge-color:#cf6a5e;bottom:calc(400px - 6px)"></span>
+		<span class="pixel-edge pixel-edge--b" style="--edge-color:#ee9a5e;bottom:calc(290px - 6px)"></span>
+		<span class="pixel-edge" style="--edge-color:#f8c477;bottom:calc(200px - 6px)"></span>
+	</div>
+	<DuskSky />
+	<BayView />
+	<FallingLeaves count={6} seed={1102} />
+	<div class="hero__inner">
+		<Window title="marron.png" class="avatar-window" flush>
+			<div class="avatar" data-avatar data-src={profile.icon}>
+				<img src={profile.icon} alt="" width="220" height="220" />
+			</div>
+		</Window>
+		<h1>{profile.name}</h1>
+		<p class="terminal">
+			<span class="terminal__prompt" aria-hidden="true">&gt;</span>
+			<span data-typewriter>{profile.tagline}</span><span class="caret" aria-hidden="true">_</span>
+		</p>
+		<ul class="hero__icons">
+			{
+				heroAccounts.map((account, index) => (
+					<li style={`--i:${index}`}>
+						<a class="icon-link" href={account.url} target="_blank" rel="noreferrer" aria-label={account.label}>
+							<PixelIcon name={account.icon} />
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</div>
+</section>
+
+<script>
+	import { mountDitheredAvatar } from '@/scripts/dusk-shaders';
+	import { typewrite } from '@/scripts/typewriter';
+
+	const avatar = document.querySelector<HTMLElement>('[data-avatar]');
+	if (avatar) {
+		mountDitheredAvatar(avatar)
+			.then(() => avatar.classList.add('is-dithered'))
+			.catch(() => {
+				// Keep the plain <img> fallback when WebGL or the image is unavailable.
+			});
+	}
+
+	const typewriter = document.querySelector<HTMLElement>('[data-typewriter]');
+	if (typewriter && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) typewrite(typewriter);
+</script>
+
+<style>
+	.hero {
+		position: relative;
+		display: grid;
+		place-items: center;
+		min-height: 100vh;
+		overflow: hidden;
+		text-align: center;
+	}
+
+	.hero {
+		background: linear-gradient(to top, #f8c477 0 200px, #ee9a5e 200px 290px, #cf6a5e 290px 400px, #9c4c6a 400px 62%, #6e3f6c 62% 80%, #4b3566 80%);
+	}
+
+	.hero__edges {
+		position: absolute;
+		inset: 0;
+	}
+
+	.hero__inner {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		padding: 96px 16px 360px;
+	}
+
+	.hero :global(.avatar-window) {
+		width: 226px;
+		margin-bottom: 24px;
+	}
+
+	/* ShaderMount inserts its canvas at z-index -1, so keep it inside this box's stacking context. */
+	.avatar {
+		position: relative;
+		isolation: isolate;
+		width: 100%;
+		aspect-ratio: 1;
+		background: var(--cream);
+	}
+
+	.avatar img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.avatar.is-dithered img {
+		visibility: hidden;
+	}
+
+	h1 {
+		color: var(--cream);
+		text-shadow:
+			4px 4px 0 var(--ink),
+			8px 8px 0 var(--maple);
+	}
+
+	.terminal {
+		display: flex;
+		gap: 8px;
+		min-width: 16em;
+		margin-top: 16px;
+		padding: 0 16px;
+		background: var(--ink);
+		color: var(--cream);
+		text-align: left;
+		border: 4px solid var(--cream);
+		border-image: var(--pixel-corner-cream) 3 / 2 / 2 stretch;
+	}
+
+	.terminal__prompt,
+	.caret {
+		color: var(--ginkgo);
+	}
+
+	.caret {
+		animation: blink 1s steps(1) infinite;
+	}
+
+	@keyframes blink {
+		50% {
+			opacity: 0;
+		}
+	}
+
+	.hero__icons {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 12px;
+		max-width: 640px;
+		margin-top: 24px;
+	}
+
+	/* The icons pop in one after another, then hop when pointed at. */
+	.hero__icons li {
+		animation: pop 0.3s steps(3) calc(0.6s + var(--i) * 0.08s) both;
+	}
+
+	@keyframes pop {
+		from {
+			translate: 0 12px;
+			opacity: 0;
+		}
+	}
+
+	.icon-link {
+		display: block;
+		filter: drop-shadow(3px 3px 0 var(--ink));
+		transition: transform 0.15s steps(2);
+	}
+
+	.icon-link:hover,
+	.icon-link:focus-visible {
+		transform: translateY(-6px);
+	}
+
+	@media (max-width: 640px) {
+		.hero__inner {
+			padding-top: 132px;
+		}
+
+		.terminal {
+			min-width: 0;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.caret,
+		.hero__icons li {
+			animation: none;
+		}
+	}
+</style>

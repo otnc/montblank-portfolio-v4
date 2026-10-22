@@ -6,11 +6,13 @@ export const profile = {
 	name: 'まろん｡',
 	handle: 'otnc',
 	twitter: '@rin_montblank',
-	avatar: '/avatar.png',
+	icon: '/icon.png',
 	bio: 'JavaScript / TypeScript / Web を触っている大学生の個人開発勢です。主にOSS開発とネタ開発をしています。フロントエンドよりもバックエンドのほうが得意です。最近は開発バイトしてます。',
 	birthday: '2006/11/02',
 	location: 'Hakodate, Hokkaido, Japan',
 	catchphrases: ['便利とロマンをシェアしよう', '思い立ったが吉日'],
+	// Typed out under the name in the hero.
+	tagline: 'くそざこ園児にゃー',
 	// Scrolled across the banner at the top.
 	messages: ['montblank.fun へようこそ', '便利とロマンをシェアしよう', '思い立ったが吉日', 'ゆっくりしていってね'],
 	email: 'contact@montblank.fun',
@@ -45,14 +47,11 @@ export interface Account extends LinkItem {
 export const accounts: Account[] = [
 	{ label: 'GitHub', handle: 'otnc', url: 'https://github.com/otnc', icon: 'github' },
 	{ label: 'GitHub', handle: 'oto-lab', url: 'https://github.com/oto-lab', icon: 'github' },
-	{ label: 'X', handle: '@rin_montblank', url: 'https://twitter.com/rin_montblank', icon: 'twitter' },
-	{ label: 'WakaTime', handle: '@otnc', url: 'https://wakatime.com/@otnc', icon: 'wakatime' },
+	{ label: 'Twitter', handle: '@rin_montblank', url: 'https://twitter.com/rin_montblank', icon: 'twitter' },
 	{ label: 'Discord', url: 'https://discord.com/users/236727759672442880', icon: 'discord' },
 	{ label: 'Misskey', handle: '@m@misskey.otnc.dev', url: 'https://misskey.otnc.dev/@m', icon: 'misskey' },
 	{ label: 'mixi2', handle: '@rin_montblank', url: 'https://mixi.social/@rin_montblank', icon: 'mixi2' },
 	{ label: 'Instagram', handle: 'rin_montblank', url: 'https://www.instagram.com/rin_montblank/', icon: 'instagram' },
-	{ label: 'SoundCloud', handle: 'marronium', url: 'https://soundcloud.com/marronium', icon: 'soundcloud' },
-	{ label: 'Spotify', url: 'https://open.spotify.com/user/31ichihsves6wrs7th6eoufpmuua', icon: 'spotify' },
 ];
 
 export interface WritingSite extends LinkItem {
@@ -113,9 +112,11 @@ export const career: CareerItem[] = [
 export interface CrossLink {
 	author: string;
 	url: string;
+	/** Their banner image, shown instead of the name when given. */
+	banner?: { src: string; width: number; height: number };
 }
 
-// Sites that link back here.
+// Sites that link back here. Add `banner` to show their banner image instead of the name.
 export const crossLinks: CrossLink[] = [
 	{ author: 'キノえもん', url: 'https://kinoemon.com' },
 	{ author: 'shikoshib', url: 'https://shikoshib.ru' },

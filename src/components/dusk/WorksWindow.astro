@@ -1,6 +1,7 @@
 ---
-import LanguageBar from '@/components/autumn/LanguageBar.astro';
-import Window from '@/components/autumn/Window.astro';
+import LanguageBar from '@/components/dusk/LanguageBar.astro';
+import Window from '@/components/dusk/Window.astro';
+import Octocat from '@/components/Octocat.astro';
 import { profile } from '@/data/profile';
 import { formatCompact } from '@/lib/format';
 import type { Work } from '@/lib/github';
@@ -43,9 +44,10 @@ const repositoriesUrl = `https://github.com/${profile.handle}?tab=repositories`;
 			<p class="notice">GitHub から作品を読み込めませんでした。</p>
 		)
 	}
-	<p class="more">
+	<div class="more">
+		<Octocat scale={3} />
 		<a class="pixel-button" href={repositoriesUrl} target="_blank" rel="noreferrer">More</a>
-	</p>
+	</div>
 </Window>
 
 <style>
@@ -91,7 +93,9 @@ const repositoriesUrl = `https://github.com/${profile.handle}?tab=repositories`;
 	}
 
 	.more {
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
 		margin-top: 24px;
-		text-align: right;
 	}
 </style>

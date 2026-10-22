@@ -1,5 +1,5 @@
 ---
-import Window from '@/components/autumn/Window.astro';
+import Window from '@/components/dusk/Window.astro';
 import PixelIcon from '@/components/PixelIcon.astro';
 import { writingSites } from '@/data/profile';
 import type { Post } from '@/lib/feeds';
@@ -13,7 +13,7 @@ const { posts } = Astro.props;
 const siteBySource = new Map(writingSites.map((site) => [site.label, site]));
 ---
 
-<Window title="feeds/" class="window--left">
+<Window title="feeds/" class="window--right">
 	<h2>Blog</h2>
 	{
 		posts && posts.length > 0 ? (

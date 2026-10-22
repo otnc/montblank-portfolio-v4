@@ -1,7 +1,6 @@
 /*
  * Design rules live in docs/rules.md.
  * Text uses PixelMplus at exact multiples of its grid so every dot stays square: PixelMplus10 at 20px for body text, PixelMplus12 at 24px and 48px for headings.
- * The palette is still the first draft from docs/rules.md and will change once the concept is settled.
  */
 :root {
 	--shell: #4a2c1d;
@@ -38,6 +37,7 @@
 	--font-heading: 'PixelMplus12', 'PixelMplus12 Extra', monospace;
 	--pixel-corner: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M3 1h1v1h-1zM4 1h1v1h-1zM2 2h1v1h-1zM5 2h1v1h-1zM1 3h1v1h-1zM6 3h1v1h-1zM1 4h1v1h-1zM6 4h1v1h-1zM2 5h1v1h-1zM5 5h1v1h-1zM3 6h1v1h-1zM4 6h1v1h-1z' fill='%234a2c1d'/%3E%3C/svg%3E");
 	--pixel-corner-ink: var(--pixel-corner);
+	--pixel-corner-cream: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M3 1h1v1h-1zM4 1h1v1h-1zM2 2h1v1h-1zM5 2h1v1h-1zM1 3h1v1h-1zM6 3h1v1h-1zM1 4h1v1h-1zM6 4h1v1h-1zM2 5h1v1h-1zM5 5h1v1h-1zM3 6h1v1h-1zM4 6h1v1h-1z' fill='%23fff4e2'/%3E%3C/svg%3E");
 	color-scheme: light;
 }
 
@@ -52,7 +52,7 @@ html {
 body {
 	position: relative;
 	margin: 0;
-	background: var(--dusk);
+	background: #1f1820;
 	color: var(--text);
 	font-family: var(--font-body);
 	font-size: 20px;
@@ -250,15 +250,16 @@ a:visited {
 
 /* ---- Page column ---- */
 
-/* The column of windows. Windows alternate slightly left and right, like a scattered desktop. */
+/* The column of windows on the slope. Windows alternate slightly left and right, like a scattered desktop. */
 .page {
 	position: relative;
+	z-index: 1;
 	display: flex;
 	flex-direction: column;
 	gap: 96px;
 	max-width: 1040px;
 	margin: 0 auto;
-	padding: 96px 16px 64px;
+	padding: 96px 16px 0;
 }
 
 .page .window--left {
