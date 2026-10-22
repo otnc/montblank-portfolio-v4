@@ -1,0 +1,33 @@
+---
+import Window from '@/components/dusk/Window.astro';
+import DuskLayout from '@/layouts/DuskLayout.astro';
+import { profile } from '@/data/profile';
+
+Astro.response.status = 404;
+---
+
+<DuskLayout path="/404" title={`404 - ${profile.name}のポートフォリオ`} description="ページが見つかりませんでした。">
+	<main id="main" class="page not-found">
+		<Window title="404.txt - メモ帳">
+			<h1>404</h1>
+			<p>ページが見つかりませんでした。</p>
+			<p class="not-found__back"><a class="pixel-button" href="/">Home</a></p>
+		</Window>
+	</main>
+</DuskLayout>
+
+<style>
+	.not-found {
+		min-height: 60vh;
+		padding-top: 160px;
+		padding-bottom: 96px;
+	}
+
+	.not-found h1 {
+		color: var(--heading);
+	}
+
+	.not-found__back {
+		margin-top: 16px;
+	}
+</style>
