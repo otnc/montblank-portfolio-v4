@@ -16,7 +16,6 @@ export const profile = {
 	// Scrolled across the banner at the top.
 	messages: ['montblank.fun へようこそ', '便利とロマンをシェアしよう', '思い立ったが吉日', 'ゆっくりしていってね'],
 	email: 'contact@montblank.fun',
-	since: 2022,
 };
 
 export interface TagGroup {
@@ -150,7 +149,7 @@ export const crossLinkRequest = {
 // The way back to otoneko.cat, which links here from its bottle mail (otnc-portfolio-v3: src/data/profile.ts `altPersona`).
 export const otherSelf = {
 	name: 'otoneko.',
-	summary: 'ネタ駆動で開発しています。便利なものから、使い道のないただの一発ネタまで。',
-	twitter: { handle: '@rin_pineapple', url: 'https://twitter.com/rin_pineapple' },
+	heading: '趣味垢はこちら',
+	summary: 'ネタ駆動の開発は otoneko. でしています。便利なものから、使い道のないただの一発ネタまで。',
 	site: { label: 'otoneko.cat', url: 'https://otoneko.cat' },
 };
