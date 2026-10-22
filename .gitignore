@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.astro/
+.wrangler/
+.env
+public/fonts/pixelmplus/
+src/styles/pixelmplus.css
+public/thumbnail.png
+public/banners/
+public/favicon.svg
+public/favicon.png
+
+# Local notes that are not part of the site
+.private/
+.dev.vars
