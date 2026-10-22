@@ -52,7 +52,7 @@ for (const bx of [10, 66]) {
 const tram = gridSvg(g, 'tram__art');
 ---
 
-<section class="stop" data-reveal>
+<section class="stop">
 	<div class="stop__letter">
 		<h2>もうひとりのわたし</h2>
 		<p>{otherSelf.summary}</p>
@@ -61,7 +61,7 @@ const tram = gridSvg(g, 'tram__art');
 			<a class="pixel-button" href={otherSelf.site.url} target="_blank" rel="noreferrer">{otherSelf.site.label} へ</a>
 		</div>
 	</div>
-	<div class="stop__street" aria-hidden="true">
+	<div class="stop__street" aria-hidden="true" data-light>
 		<span class="stop__rails"></span>
 		<span class="stop__pole"><span>電停</span></span>
 		<div class="tram" style={`--w:${W};--h:${H}`}>
@@ -126,31 +126,36 @@ const tram = gridSvg(g, 'tram__art');
 		);
 	}
 
+	/* Where the tram stops; the pole stands just ahead of its front. */
+	.stop__street {
+		--stop-x: calc(50% - 168px);
+	}
+
 	.tram {
 		position: absolute;
-		left: calc(50% - 168px);
+		left: var(--stop-x);
 		bottom: 12px;
 		width: calc(var(--w) * 3px);
 		height: calc(var(--h) * 3px);
 		filter: drop-shadow(6px 6px 0 #00000055);
 	}
 
+	/* The body rattles on its own element, so it never fights the run animation over `translate`. */
 	.tram :global(.tram__art) {
 		display: block;
+		animation: idle 0.8s steps(1) infinite;
 	}
 
 	/*
 	 * Once the stop is seen, trams run in a loop: one comes in from the left, waits at the stop, pulls out to the right,
 	 * and after a short gap the next one comes in. Each leg moves in hard steps.
 	 */
-	:global(.js) .stop:not(.is-visible) .tram {
+	:global(.js) .stop__street:not(.is-visible) .tram {
 		visibility: hidden;
 	}
 
-	:global(.js) .stop.is-visible .tram {
-		animation:
-			run 16s both infinite,
-			idle 0.8s steps(1) infinite;
+	:global(.js) .stop__street.is-visible .tram {
+		animation: run 16s both infinite;
 	}
 
 	@keyframes run {
@@ -181,7 +186,7 @@ const tram = gridSvg(g, 'tram__art');
 	/* The stop sign: a pole with a plate. */
 	.stop__pole {
 		position: absolute;
-		left: calc(50% + 140px);
+		left: calc(var(--stop-x) + 306px);
 		bottom: 30px;
 		width: 6px;
 		height: 108px;
@@ -203,22 +208,18 @@ const tram = gridSvg(g, 'tram__art');
 	}
 
 	@media (max-width: 640px) {
-		.tram {
-			left: 8px;
-		}
-
-		.stop__pole {
-			left: auto;
-			right: 32px;
+		.stop__street {
+			--stop-x: 8px;
 		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.tram {
+		.tram,
+		.tram :global(.tram__art) {
 			animation: none !important;
 		}
 
-		:global(.js) .stop .tram {
+		:global(.js) .stop__street .tram {
 			visibility: visible;
 		}
 	}
