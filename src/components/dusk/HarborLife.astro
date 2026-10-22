@@ -1,7 +1,7 @@
 ---
 /**
- * What floats and flies over the harbour behind the windows: ripples catching the light, small boats near the top,
- * squid-fishing boats with their strings of lamps lower down where night has fallen, blinking buoys and passing gulls.
+ * The life of the harbour behind the windows: ripples catching the light, Hakodate squid jetting through the water
+ * on both sides of the path, and gulls passing overhead.
  * Positions are percentages of the page height, so they spread over any length of content.
  */
 import { random, spriteSvg } from '@/lib/pixel-grid';
@@ -15,22 +15,28 @@ const ripples = Array.from({ length: 70 }, () => ({
 	delay: (-rand() * 2).toFixed(2),
 }));
 
-const BOAT = ['.....m.....', '.....m.....', '....ccc....', '..wwwwwww..', 'hhhhhhhhhhh', '.hhhhhhhhh.'];
-const boat = spriteSvg(BOAT, { m: '#3a2e3a', c: '#e8dcc8', w: '#f4ece0', h: '#2f5a9a' });
-// A squid-fishing boat: a white hull, a cabin and the wire its lamps hang from (the lamps are drawn separately so they can glow).
-const SQUID = [
-	'...k..........k..........k...',
-	'.kkkkkkkkkkkkkkkkkkkkkkkkkkk.',
-	'...k..........k..........k...',
-	'...k..........k.....wwww.k...',
-	'...k..........k....wwwwww....',
-	'...k..........k....wnwnww....',
-	'hhhhhhhhhhhhhhhhhhhhhhhhhhhhh',
-	'.bbbbbbbbbbbbbbbbbbbbbbbbbbb.',
-	'..bbbbbbbbbbbbbbbbbbbbbbbbb..',
-	'...bbbbbbbbbbbbbbbbbbbbbbb...',
+// A squid swimming mantle first: fins at the top, two eyes, and its arms either trailing together or spread after a jet.
+const SQUID_BODY = [
+	'.....mm.....',
+	'....mmmm....',
+	'...mmmmmm...',
+	'..mmmmmmmm..',
+	'.mmmmmmmmmm.',
+	'..mmmmmmmm..',
+	'....mmmm....',
+	'....msmm....',
+	'....mmsm....',
+	'....msmm....',
+	'....mmmm....',
+	'....mmsm....',
+	'....emme....',
+	'....mmmm....',
 ];
-const squid = spriteSvg(SQUID, { k: '#1a1622', w: '#e8dcc8', n: '#ffd27a', h: '#f4ece0', b: '#3a4a7a' });
+const SQUID_PALETTE = { m: '#f2d4cc', s: '#d08070', e: '#2a1a24', t: '#e8bfb4' };
+const squid = [
+	spriteSvg([...SQUID_BODY, '....t..t....', '...t.tt.t...', '...t.tt.t...', '....t..t....'], SQUID_PALETTE),
+	spriteSvg([...SQUID_BODY, '...t.tt.t...', '..t..tt..t..', '.t...tt...t.', 't..........t'], SQUID_PALETTE),
+];
 // A tile of small wave marks scattered over the water, drifted slowly by CSS.
 const WAVE_TILE = [
 	'................................',
@@ -44,20 +50,13 @@ const WAVE_TILE = [
 ];
 const waveSvg = spriteSvg(WAVE_TILE, { w: '#ffffff' }).replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ');
 const waveTile = `url("data:image/svg+xml,${encodeURIComponent(waveSvg)}")`;
-const boats = [
-	{ left: 12, top: 6, duration: 70, delay: -10 },
-	{ left: 70, top: 16, duration: 90, delay: -50 },
-];
-const squidBoats = [
-	{ left: 4, top: 62 },
-	{ left: 82, top: 70 },
-	{ left: 14, top: 84 },
-	{ left: 74, top: 92 },
-];
-const buoys = [
-	{ left: 3, top: 30, color: '#e0573a' },
-	{ left: 95, top: 44, color: '#6fbf73' },
-	{ left: 6, top: 52, color: '#e0573a' },
+const squids = [
+	{ left: 5, top: 8, delay: 0 },
+	{ left: 91, top: 22, delay: -1.7 },
+	{ left: 9, top: 41, delay: -3.1 },
+	{ left: 87, top: 58, delay: -0.9 },
+	{ left: 4, top: 74, delay: -2.4 },
+	{ left: 92, top: 88, delay: -4.0 },
 ];
 const GULL = [spriteSvg(['w.....w', '.w...w.', '..www..'], { w: '#f4ece0' }), spriteSvg(['.......', 'wwwwwww', '..www..'], { w: '#f4ece0' })];
 ---
@@ -65,23 +64,13 @@ const GULL = [spriteSvg(['w.....w', '.w...w.', '..www..'], { w: '#f4ece0' }), sp
 <div class="life" aria-hidden="true" style={`--wave-tile:${waveTile}`}>
 	{ripples.map((r) => <span class="ripple" style={`left:${r.left}%;top:${r.top}%;width:${r.width}px;--delay:${r.delay}s`} />)}
 	{
-		boats.map((b) => (
-			<span class="boat" style={`left:${b.left}%;top:${b.top}%;--duration:${b.duration}s;--delay:${b.delay}s`}>
-				<span class="bob" set:html={boat} />
+		squids.map((s) => (
+			<span class="squid" style={`left:${s.left}%;top:${s.top}%;--delay:${s.delay}s`}>
+				<span class="squid__glide" set:html={squid[0]} />
+				<span class="squid__jet" set:html={squid[1]} />
 			</span>
 		))
 	}
-	{
-		squidBoats.map((b, index) => (
-			<span class="squid" style={`left:${b.left}%;top:${b.top}%;--delay:${-index * 0.7}s`}>
-				<span class="bob">
-					<Fragment set:html={squid} />
-					<span class="squid__lamps" />
-				</span>
-			</span>
-		))
-	}
-	{buoys.map((b, index) => <span class="buoy" style={`left:${b.left}%;top:${b.top}%;--color:${b.color};--delay:${index * 0.5}s`} />)}
 	<div class="gull-layer">
 		{
 			[0, 1].map((index) => (
@@ -140,65 +129,60 @@ const GULL = [spriteSvg(['w.....w', '.w...w.', '..www..'], { w: '#f4ece0' }), sp
 		}
 	}
 
-	.boat {
-		animation: drift var(--duration) steps(300) var(--delay) infinite alternate;
+	/*
+	 * A squid jets upward in a quick burst with its arms spread, then trails them and sinks slowly back,
+	 * the way squid swim. Both legs move in hard steps.
+	 */
+	.squid {
+		animation: swim 4.8s var(--delay) infinite;
 	}
 
-	@keyframes drift {
-		to {
-			translate: 30vw 0;
+	@keyframes swim {
+		0% {
+			translate: 0 0;
+			animation-timing-function: steps(3);
+		}
+		12% {
+			translate: 6px -54px;
+			animation-timing-function: steps(12);
+		}
+		100% {
+			translate: 0 0;
 		}
 	}
 
-	.bob {
-		display: block;
-		position: relative;
-		animation: bob 2s steps(2) infinite;
-	}
-
-	@keyframes bob {
-		50% {
-			translate: 0 3px;
-		}
-	}
-
-	.squid .bob {
-		animation-delay: var(--delay);
-	}
-
-	/* The fishing lamps: a row of bright bulbs under the wire, with a halo on the water around them. */
-	.squid__lamps {
+	.squid__jet {
 		position: absolute;
-		left: 9px;
-		top: 6px;
-		width: 69px;
-		height: 6px;
-		background: repeating-linear-gradient(90deg, #fff6d0 0 3px, transparent 3px 9px);
-		box-shadow:
-			0 0 0 6px #ffe7a033,
-			0 0 0 15px #ffe7a01a;
-		animation: lamps 3s steps(1) var(--delay) infinite;
+		inset: 0;
 	}
 
-	@keyframes lamps {
-		50% {
-			background: repeating-linear-gradient(90deg, transparent 0 3px, #fff6d0 3px 6px, transparent 6px 9px);
+	.squid__glide,
+	.squid__jet {
+		animation: squid-glide 4.8s steps(1) var(--delay) infinite;
+	}
+
+	.squid__jet {
+		animation-name: squid-jet;
+	}
+
+	/* With steps(1) each keyframe holds until the next, so both states are spelled out. */
+	@keyframes squid-glide {
+		0% {
+			visibility: hidden;
+		}
+		14%,
+		100% {
+			visibility: visible;
 		}
 	}
 
-	.buoy {
-		width: 9px;
-		height: 12px;
-		background: var(--color);
-		outline: 3px solid #1a1622;
-		animation:
-			bob 2.4s steps(2) var(--delay) infinite,
-			flash 2s steps(1) var(--delay) infinite;
-	}
-
-	@keyframes flash {
-		50% {
-			box-shadow: 0 -9px 0 -3px #fff6d0;
+	@keyframes squid-jet {
+		0% {
+			visibility: visible;
+		}
+		14%,
+		100% {
+			visibility: hidden;
 		}
 	}
 
@@ -252,8 +236,7 @@ const GULL = [spriteSvg(['w.....w', '.w...w.', '..www..'], { w: '#f4ece0' }), sp
 	}
 
 	@media (max-width: 1100px) {
-		.squid,
-		.buoy {
+		.squid {
 			display: none;
 		}
 	}

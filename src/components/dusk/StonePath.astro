@@ -8,12 +8,12 @@ import { Grid, gridSvg, random } from '@/lib/pixel-grid';
 
 const TILE_W = 96;
 const TILE_H = 64;
-const STONES = ['#8e8a94', '#84808c', '#98949c', '#7c7884', '#8a8590'];
+const STONES = ['#8e8a94', '#88848e', '#98949c', '#928e98', '#8a8590'];
 const JOINT = '#5a5660';
 const rand = random(1879);
 
 // Flagstones are the cells of a Voronoi diagram over seeds that wrap around the tile, so the tile repeats without seams.
-const seeds = Array.from({ length: 28 }, () => ({ x: rand() * TILE_W, y: rand() * TILE_H, color: STONES[Math.floor(rand() * STONES.length)] }));
+const seeds = Array.from({ length: 40 }, () => ({ x: rand() * TILE_W, y: rand() * TILE_H, color: STONES[Math.floor(rand() * STONES.length)] }));
 const wrapped = (a: number, b: number, size: number) => {
 	const d = Math.abs(a - b);
 	return Math.min(d, size - d);
@@ -30,7 +30,7 @@ for (let y = 0; y < TILE_H; y += 1) {
 				nearest = { d, color: seed.color };
 			} else if (d < second) second = d;
 		}
-		g.set(x, y, second - nearest.d < 1.1 ? JOINT : nearest.color);
+		g.set(x, y, second - nearest.d < 0.9 ? JOINT : nearest.color);
 	}
 }
 const svg = gridSvg(g).replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ');
