@@ -9,11 +9,13 @@ interface Props {
 }
 
 const { contributions } = Astro.props;
+// As in portfolio-v3, a count of none (or one that could not be read) shows as "-".
+const count = (value: number | null) => (value ? formatCompact(value) : '-');
 ---
 
 <Window title="contributions.txt" class="window--left">
 	<h2>Contributions</h2>
-	<p class="muted">他のリポジトリにマージされたプルリクエスト</p>
+	<p class="muted">他のリポジトリにマージされたプルリクエストと Issue</p>
 	{
 		contributions && contributions.length > 0 ? (
 			<ul class="repos">
@@ -25,11 +27,12 @@ const { contributions } = Astro.props;
 								{repo.name}
 							</span>
 							<span class="repo__counts">
-								<span title="Stars">★ {formatCompact(repo.stars)}</span>
-								<span title="Merged pull requests">PR {repo.mergedCount}</span>
+								<span title="Stars"><span>★</span><span>{count(repo.stars)}</span></span>
+								<span title="Merged pull requests"><span>PR</span><span>{count(repo.mergedCount)}</span></span>
+								<span title="Issues opened"><span>Issue</span><span>{count(repo.issueCount)}</span></span>
 							</span>
 						</a>
-						<LanguageBar languages={repo.languages} labelled={2} />
+						<LanguageBar languages={repo.languages} labelled={3} />
 					</li>
 				))}
 			</ul>
@@ -53,6 +56,7 @@ const { contributions } = Astro.props;
 	.repo {
 		display: flex;
 		flex-wrap: wrap;
+		align-items: baseline;
 		justify-content: space-between;
 		gap: 0 16px;
 		padding: 2px 8px;
@@ -66,15 +70,24 @@ const { contributions } = Astro.props;
 	}
 
 	.repo__name {
+		min-width: 0;
+		overflow-wrap: anywhere;
 		text-decoration: underline;
 	}
 
-	.repo__name {
-		overflow-wrap: anywhere;
+	/* Fixed, right-aligned columns, so stars, pull requests and issues line up from row to row. */
+	.repo__counts {
+		display: grid;
+		grid-template-columns: 100px 70px 90px;
+		gap: 0 30px;
+		margin-left: auto;
+		white-space: nowrap;
 	}
 
-	.repo__counts {
+	/* Label on the left, number on the right of each column. */
+	.repo__counts > span {
 		display: flex;
-		gap: 16px;
+		justify-content: space-between;
+		gap: 6px;
 	}
 </style>

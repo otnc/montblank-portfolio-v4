@@ -1,7 +1,7 @@
 // The token-less way to read GitHub, as portfolio-v3 did: the unofficial pinned API, the public REST API (60 calls an hour per IP),
 // ungh.cc for star counts and the contribution calendar on github.com. Used when GITHUB_TOKEN is not set.
 import { CACHE_SECONDS, cached } from '@/lib/cache';
-import type { Contribution, GithubStats, LanguageShare, Work } from '@/lib/github';
+import { sortContributions, type Contribution, type GithubStats, type LanguageShare, type Work } from '@/lib/github';
 
 const API = 'https://api.github.com';
 const PINNED_API_URL = 'https://pinned.berrysauce.dev/get';
@@ -11,7 +11,7 @@ const COLORS_URL = 'https://raw.githubusercontent.com/ozh/github-colors/master/c
 const FALLBACK_LANGUAGE_COLOR = '#8b8b8b';
 const RECENT_DAYS = 31;
 // ungh.cc is called once per repository, so cap it to stay well under the Worker's subrequest limit.
-const MAX_STAR_LOOKUPS = 24;
+const MAX_STAR_LOOKUPS = 30;
 const HEADERS = { Accept: 'application/vnd.github+json', 'User-Agent': 'montblank.fun' };
 
 async function getJson<T>(url: string, headers: Record<string, string> = HEADERS): Promise<T> {
@@ -152,32 +152,54 @@ export function getPublicWorks(login: string) {
 
 // ---- Contributions ----
 
-export function getPublicContributions(login: string) {
-	return cached(`public-contributions:${login}`, CACHE_SECONDS, async (): Promise<Contribution[]> => {
-		const query = encodeURIComponent(`type:pr author:${login} is:merged -user:${login}`);
-		const counts = new Map<string, number>();
-		// Anonymous search allows 10 calls a minute, so read at most two pages.
-		for (let page = 1; page <= 2; page += 1) {
-			const data = await getJson<{ items: { repository_url: string }[] }>(`${API}/search/issues?q=${query}&per_page=100&page=${page}`);
-			for (const item of data.items) {
-				const repo = item.repository_url.match(/repos\/([^/]+\/[^/]+)$/)?.[1];
-				if (repo) counts.set(repo, (counts.get(repo) ?? 0) + 1);
-			}
-			if (data.items.length < 100) break;
+// The search API returns at most 1,000 results (10 pages of 100).
+const SEARCH_MAX_PAGES = 10;
+
+/** Counts the results of an issue search per repository ("owner/name"). */
+async function countByRepository(query: string) {
+	const counts = new Map<string, number>();
+	for (let page = 1; page <= SEARCH_MAX_PAGES; page += 1) {
+		const data = await getJson<{ items: { repository_url: string }[] }>(
+			`${API}/search/issues?q=${encodeURIComponent(query)}&per_page=100&page=${page}`,
+		);
+		for (const item of data.items) {
+			const repo = item.repository_url.match(/repos\/([^/]+\/[^/]+)$/)?.[1];
+			if (repo) counts.set(repo, (counts.get(repo) ?? 0) + 1);
 		}
+		if (data.items.length < 100) break;
+	}
+	return counts;
+}
+
+/** Merged pull requests and opened issues in other people's repositories, as portfolio-v3 counted them. Languages are left out without a token. */
+export function getPublicContributions(login: string) {
+	return cached(`public-contributions-v2:${login}`, CACHE_SECONDS, async (): Promise<Contribution[]> => {
+		const [merged, issues] = await Promise.all([
+			countByRepository(`type:pr author:${login} is:merged -user:${login}`),
+			countByRepository(`type:issue author:${login} -user:${login}`),
+		]);
+		const repos = [...new Set([...merged.keys(), ...issues.keys()])];
 		const contributions = await Promise.all(
-			[...counts].map(async ([repo, mergedCount], index) => {
+			repos.map(async (repo, index) => {
 				const [owner, name] = repo.split('/');
 				const stars =
 					index < MAX_STAR_LOOKUPS
 						? await getJson<{ repo?: { stars?: number } }>(`${UNGH_API_URL}/repos/${repo}`, { 'User-Agent': 'montblank.fun' }).then(
-								(data) => data.repo?.stars ?? 0,
-								() => 0,
+								(data) => data.repo?.stars ?? null,
+								() => null,
 							)
-						: 0;
-				return { owner, name, url: `https://github.com/${repo}`, mergedCount, stars, languages: [] };
+						: null;
+				return {
+					owner,
+					name,
+					url: `https://github.com/${repo}`,
+					mergedCount: merged.get(repo) ?? 0,
+					issueCount: issues.get(repo) ?? 0,
+					stars,
+					languages: [],
+				};
 			}),
 		);
-		return contributions.sort((a, b) => b.stars - a.stars || b.mergedCount - a.mergedCount);
+		return sortContributions(contributions);
 	});
 }

@@ -37,9 +37,27 @@ export interface Contribution {
 	owner: string;
 	name: string;
 	url: string;
+	/** Merged pull requests by the user. */
 	mergedCount: number;
-	stars: number;
+	/** Issues opened by the user. */
+	issueCount: number;
+	/** `null` when the star count could not be read. */
+	stars: number | null;
 	languages: LanguageShare[];
+}
+
+/**
+ * The order portfolio-v3 used: biggest projects (by stars) first, unknown star counts last,
+ * and ties broken by how much the user contributed (merged pull requests plus issues).
+ */
+export function sortContributions(contributions: Contribution[]) {
+	const total = (c: Contribution) => c.mergedCount + c.issueCount;
+	return contributions.sort((a, b) => {
+		if (a.stars === null && b.stars === null) return total(b) - total(a);
+		if (a.stars === null) return 1;
+		if (b.stars === null) return -1;
+		return b.stars - a.stars || total(b) - total(a);
+	});
 }
 
 interface LanguageEdges {
@@ -222,11 +240,12 @@ export function getWorks(token: string | undefined, login: string) {
 
 // ---- Contributions ----
 
+type SearchRepository = { name: string; url: string; owner: { login: string }; stargazerCount: number; languages: LanguageEdges };
+
 interface SearchPage {
 	search: {
 		pageInfo: { hasNextPage: boolean; endCursor: string | null };
-		// Empty objects for results that are not pull requests, which the query never returns.
-		nodes: { repository?: { name: string; url: string; owner: { login: string }; stargazerCount: number; languages: LanguageEdges } }[];
+		nodes: { repository?: SearchRepository }[];
 	};
 }
 
@@ -234,46 +253,59 @@ const CONTRIBUTIONS_QUERY = `
 	query ($query: String!, $after: String) {
 		search(query: $query, type: ISSUE, first: 100, after: $after) {
 			pageInfo { hasNextPage endCursor }
-			nodes { ... on PullRequest { repository { name url owner { login } stargazerCount ${LANGUAGES_FIELD} } } }
+			nodes {
+				... on PullRequest { repository { name url owner { login } stargazerCount ${LANGUAGES_FIELD} } }
+				... on Issue { repository { name url owner { login } stargazerCount ${LANGUAGES_FIELD} } }
+			}
 		}
 	}
 `;
 
-/**
- * Merged pull requests to other people's repositories, grouped by repository, biggest projects (by stars) first.
- * GraphQL search returns the repository with each result, so stars and languages need no extra requests.
- * Like the REST search, it stops at 1,000 results.
- */
-async function fetchContributions(token: string, login: string): Promise<Contribution[]> {
-	const byRepo = new Map<string, Contribution>();
-	const query = `type:pr author:${login} is:merged -user:${login}`;
+/** Every result of a search, up to the 1,000 GitHub returns, as the repositories they belong to. */
+async function searchRepositories(token: string, query: string) {
+	const repositories: SearchRepository[] = [];
 	let after: string | null = null;
 	do {
 		const page: SearchPage = await graphql<SearchPage>(token, CONTRIBUTIONS_QUERY, { query, after });
-		for (const { repository } of page.search.nodes) {
-			if (!repository) continue;
-			const key = `${repository.owner.login}/${repository.name}`;
-			const known = byRepo.get(key);
-			if (known) {
-				known.mergedCount += 1;
-				continue;
-			}
-			byRepo.set(key, {
+		for (const { repository } of page.search.nodes) if (repository) repositories.push(repository);
+		after = page.search.pageInfo.hasNextPage ? page.search.pageInfo.endCursor : null;
+	} while (after);
+	return repositories;
+}
+
+/**
+ * Pull requests merged into other people's repositories and issues opened there, counted per repository, as portfolio-v3 did.
+ * GraphQL search returns the repository with each result, so stars and languages need no extra requests.
+ */
+async function fetchContributions(token: string, login: string): Promise<Contribution[]> {
+	const [merged, issues] = await Promise.all([
+		searchRepositories(token, `type:pr author:${login} is:merged -user:${login}`),
+		searchRepositories(token, `type:issue author:${login} -user:${login}`),
+	]);
+	const byRepo = new Map<string, Contribution>();
+	const entry = (repository: SearchRepository) => {
+		const key = `${repository.owner.login}/${repository.name}`;
+		let contribution = byRepo.get(key);
+		if (!contribution) {
+			contribution = {
 				owner: repository.owner.login,
 				name: repository.name,
 				url: repository.url,
-				mergedCount: 1,
+				mergedCount: 0,
+				issueCount: 0,
 				stars: repository.stargazerCount,
 				languages: languageShares(repository.languages),
-			});
+			};
+			byRepo.set(key, contribution);
 		}
-		after = page.search.pageInfo.hasNextPage ? page.search.pageInfo.endCursor : null;
-	} while (after);
-
-	return [...byRepo.values()].sort((a, b) => b.stars - a.stars || b.mergedCount - a.mergedCount);
+		return contribution;
+	};
+	for (const repository of merged) entry(repository).mergedCount += 1;
+	for (const repository of issues) entry(repository).issueCount += 1;
+	return sortContributions([...byRepo.values()]);
 }
 
 export function getContributions(token: string | undefined, login: string) {
 	if (!token) return getPublicContributions(login);
-	return cached(`github-contributions:${login}`, CACHE_SECONDS, () => fetchContributions(token, login));
+	return cached(`github-contributions-v2:${login}`, CACHE_SECONDS, () => fetchContributions(token, login));
 }
