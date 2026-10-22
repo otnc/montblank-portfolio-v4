@@ -1,4 +1,5 @@
 import { CACHE_SECONDS, cached } from '@/lib/cache';
+import { getPublicContributions, getPublicStats, getPublicWorks } from '@/lib/github-public';
 
 const GRAPHQL_URL = 'https://api.github.com/graphql';
 const USER_AGENT = 'montblank.fun';
@@ -176,7 +177,9 @@ async function fetchStats(token: string, login: string): Promise<GithubStats> {
 	};
 }
 
-export function getGithubStats(token: string, login: string) {
+/** Uses GraphQL when a token is set, otherwise the token-less sources in github-public.ts. */
+export function getGithubStats(token: string | undefined, login: string) {
+	if (!token) return getPublicStats(login);
 	return cached(`github-stats:${login}`, CACHE_SECONDS, () => fetchStats(token, login));
 }
 
@@ -212,7 +215,8 @@ async function fetchWorks(token: string, login: string): Promise<Work[]> {
 	}));
 }
 
-export function getWorks(token: string, login: string) {
+export function getWorks(token: string | undefined, login: string) {
+	if (!token) return getPublicWorks(login);
 	return cached(`github-works:${login}`, CACHE_SECONDS, () => fetchWorks(token, login));
 }
 
@@ -269,6 +273,7 @@ async function fetchContributions(token: string, login: string): Promise<Contrib
 	return [...byRepo.values()].sort((a, b) => b.stars - a.stars || b.mergedCount - a.mergedCount);
 }
 
-export function getContributions(token: string, login: string) {
+export function getContributions(token: string | undefined, login: string) {
+	if (!token) return getPublicContributions(login);
 	return cached(`github-contributions:${login}`, CACHE_SECONDS, () => fetchContributions(token, login));
 }
