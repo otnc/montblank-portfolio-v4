@@ -62,6 +62,7 @@ const tram = gridSvg(g, 'tram__art');
 		</div>
 	</div>
 	<div class="stop__street" aria-hidden="true">
+		<span class="stop__rails"></span>
 		<span class="stop__pole"><span>電停</span></span>
 		<div class="tram" style={`--w:${W};--h:${H}`}>
 			<Fragment set:html={tram} />
@@ -102,23 +103,32 @@ const tram = gridSvg(g, 'tram__art');
 		border-top: 24px solid;
 		border-image: repeating-linear-gradient(90deg, #6a5a60 0 45px, #3e3238 45px 48px) 24;
 		margin-inline: calc(50% - 50vw);
-		background: linear-gradient(
-			#c0a898 0 6px,
-			#3a2a2e 6px 147px,
-			#1e1418 147px 150px,
-			#5e5058 150px 153px,
-			#3a2a2e 153px 159px,
-			#1e1418 159px 162px,
-			#5e5058 162px 165px,
-			#3a2a2e 165px 171px,
-			#c0a898 171px 177px
-		);
+		background: linear-gradient(#c0a898 0 6px, #3a2a2e 6px 171px, #c0a898 171px 177px);
 		overflow: hidden;
+	}
+
+	/*
+	 * Two rails set into the street, seen from the side: the far rail higher up, the near one under the wheels.
+	 * Each is a bright rail head over its dark groove, with the paving between them a shade lighter than the asphalt.
+	 */
+	.stop__rails {
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 6px;
+		height: 18px;
+		background: linear-gradient(
+			#8a8088 0 3px,
+			#1e1418 3px 6px,
+			#463840 6px 12px,
+			#c8c0c8 12px 15px,
+			#1e1418 15px 18px
+		);
 	}
 
 	.tram {
 		position: absolute;
-		left: calc(50% - 200px);
+		left: calc(50% - 168px);
 		bottom: 12px;
 		width: calc(var(--w) * 3px);
 		height: calc(var(--h) * 3px);
@@ -129,20 +139,36 @@ const tram = gridSvg(g, 'tram__art');
 		display: block;
 	}
 
-	/* Pulls in from the left in hard steps the first time it is seen, then idles. */
+	/*
+	 * Once the stop is seen, trams run in a loop: one comes in from the left, waits at the stop, pulls out to the right,
+	 * and after a short gap the next one comes in. Each leg moves in hard steps.
+	 */
 	:global(.js) .stop:not(.is-visible) .tram {
 		visibility: hidden;
 	}
 
 	:global(.js) .stop.is-visible .tram {
 		animation:
-			arrive 2.4s steps(24) both,
-			idle 0.8s steps(1) 2.4s infinite;
+			run 16s both infinite,
+			idle 0.8s steps(1) infinite;
 	}
 
-	@keyframes arrive {
-		from {
+	@keyframes run {
+		0% {
 			translate: calc(-50vw - 320px) 0;
+			animation-timing-function: steps(24);
+		}
+		20% {
+			translate: 0 0;
+			animation-timing-function: steps(1);
+		}
+		50% {
+			translate: 0 0;
+			animation-timing-function: steps(24);
+		}
+		72%,
+		100% {
+			translate: calc(50vw + 320px) 0;
 		}
 	}
 
