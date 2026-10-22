@@ -10,7 +10,7 @@ npm run build    # フォントと画像を生成してから astro build
 
 Node.js は 22.12 以上が必要です (Astro 7 の要件)。
 
-手元で GitHub のセクションを表示するには、リポジトリ直下に `.dev.vars` (git 管理外) を置きます。
+手元では GitHub のトークンなしでも動きます (`src/lib/github-public.ts`)。本番と同じ GraphQL で確かめるときは、リポジトリ直下に `.dev.vars` (git 管理外) を置きます。
 
 ```sh
 GITHUB_TOKEN=github_pat_...
@@ -35,7 +35,7 @@ Pages プロジェクトは直接アップロード型なので、Cloudflare 側
 
 | 名前 | 必須 | 用途 |
 | --- | --- | --- |
-| `GITHUB_TOKEN` | 必須 | GitHub GraphQL API のトークン。読み取り専用の fine-grained token (公開リポジトリの読み取りだけ) で足りる。ないと GitHub、Works、Contributions に案内が出る |
+| `GITHUB_TOKEN` | 推奨 | GitHub GraphQL API のトークン。読み取り専用の fine-grained token (公開リポジトリの読み取りだけ) で足りる。ないとトークンなしの取り方になり、言語の割合がおおよそになり、レート制限にもかかりやすい |
 
 Secret として登録します。
 
@@ -56,19 +56,19 @@ npx wrangler pages secret put GITHUB_TOKEN --project-name montblank-portfolio
 
 ## OGP 画像、相互リンク用バナー、favicon
 
-`npm run images` ([scripts/build-images.mjs](../scripts/build-images.mjs)) が次の画像を作ります。PixelMplus の字形で描き、アイコンは `public/avatar.png` をもとにします。今の絵柄は仮で、コンセプトが決まったら描き直します。
+`npm run images` ([scripts/build-images.mjs](../scripts/build-images.mjs)) が次の画像を作ります。otoneko.cat と同じ3種類で、どれも夕暮れの函館山と赤レンガ倉庫を背景に、PixelMplus の字形で描きます。アイコンは `public/icon.png` をもとにします。
 
 | ファイル | 大きさ | 用途 |
 | --- | --- | --- |
 | `public/thumbnail.png` | 1200x630 | OGP 画像 |
 | `public/banners/normal.png` | 200x40 | 相互リンク用バナー |
-| `public/favicon.svg`、`public/favicon.png` | 32x32 | favicon |
+| `public/favicon.svg`、`public/favicon.png` | 32x32 | favicon。夕日の輪の中に顔、外側は透過 |
 
 `npm run dev` と `npm run build` の前に毎回作り直します。生成物は git 管理外です。生成した画像は 4倍から8倍に拡大して目で確かめます。
 
 ## アイコン
 
-アイコンは `public/avatar.png` (400x400) の1枚です。今は portfolio-v3 のアイコンを仮に置いています。差し替えるときは、この画像を置き換えて `npm run images` を実行します。線画なら明暗を強めてから置きます。小さいバナーと favicon は頭のまわりを切り抜いているので、構図が大きく変わったら `scripts/build-images.mjs` の `bannerAvatar` の切り抜き位置も合わせます。
+アイコンは `public/icon.png` (400x400) の1枚です。ヒーローのディザと、サムネイル・バナー・favicon の元にします。線画で線が細いので、線を太らせて明暗を強めた画像を置いています。差し替えるときは、同じように加工してから置き換え、`npm run images` を実行します。小さいバナーと favicon は頭のまわりを切り抜いているので、構図が大きく変わったら `scripts/build-images.mjs` の `bannerAvatar` の切り抜き位置も合わせます。
 
 ## フォント
 

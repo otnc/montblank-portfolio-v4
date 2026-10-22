@@ -14,7 +14,7 @@ This covers:
 
 These belong to others and are not licensed by this repository:
 
-- The avatar image (`public/avatar.png`). The generated thumbnail, banner and favicon contain a copy of it, which is likewise not covered.
-- The marks of GitHub, X (Twitter), Misskey, WakaTime, Discord, mixi2, Instagram, SoundCloud, Spotify, Zenn, Qiita and note, including the pixel versions in `src/data/pixel-icons.ts`. They are trademarks of their owners. The GitHub and Twitter grids come from NES.css (see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)).
+- The avatar image (`public/icon.png`). The generated thumbnail, banner and favicon contain a copy of it, which is likewise not covered.
+- The Octocat and the marks of GitHub, Twitter, Misskey, Discord, mixi2, Instagram, Zenn, Qiita and note, including the pixel versions in `src/data/pixel-icons.ts`. They are trademarks of their owners. The GitHub and Twitter grids and the Octocat come from NES.css (see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)).
 - The PixelMplus fonts in `fonts/pixelmplus/`, distributed under the M+ FONT LICENSE included there.
 - Text fetched at request time from GitHub and the blog feeds.

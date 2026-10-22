@@ -4,7 +4,7 @@ This project includes material from the following projects. Their licenses are r
 
 ## NES.css
 
-The pixel grids for the GitHub and Twitter icons in `src/data/pixel-icons.ts` are ported from [NES.css](https://github.com/nostalgic-css/NES.css).
+The pixel grids for the GitHub and Twitter icons and the Octocat in `src/data/pixel-icons.ts` are ported from [NES.css](https://github.com/nostalgic-css/NES.css).
 
 ```text
 MIT License
