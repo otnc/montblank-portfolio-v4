@@ -11,6 +11,12 @@ interface Props {
 
 const { posts } = Astro.props;
 const siteBySource = new Map(writingSites.map((site) => [site.label, site]));
+// As in portfolio-v3, posts from the last week get a "New" label.
+const NEW_WITHIN_MS = 7 * 24 * 60 * 60 * 1000;
+const isNew = (date: string) => {
+	const age = Date.now() - Date.parse(date);
+	return age >= 0 && age <= NEW_WITHIN_MS;
+};
 ---
 
 <Window title="feeds/" class="window--right">
@@ -25,7 +31,10 @@ const siteBySource = new Map(writingSites.map((site) => [site.label, site]));
 							<a class="post" href={post.url} target="_blank" rel="noreferrer">
 								{site && <PixelIcon name={site.icon} scale={2} />}
 								<span class="post__body">
-									<span class="post__title">{post.title}</span>
+									<span class="post__title">
+										{post.date && isNew(post.date) && <span class="post__new">New</span>}
+										{post.title}
+									</span>
 									{post.description && <span class="post__desc muted">{post.description}</span>}
 									<span class="post__meta muted">
 										{post.source} {formatDate(post.date)}
@@ -85,6 +94,29 @@ const siteBySource = new Map(writingSites.map((site) => [site.label, site]));
 
 	.post__title {
 		text-decoration: underline;
+	}
+
+	.post__new {
+		display: inline-block;
+		margin-right: 8px;
+		padding: 0 6px;
+		background: var(--maple);
+		color: var(--cream);
+		text-decoration: none;
+		animation: new-blink 1.2s steps(1) infinite;
+	}
+
+	@keyframes new-blink {
+		50% {
+			background: var(--ginkgo);
+			color: var(--ink);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.post__new {
+			animation: none;
+		}
 	}
 
 	/* Descriptions vary in length, so keep every post to two lines. */

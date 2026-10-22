@@ -18,8 +18,6 @@ const FEEDS = [
 	{ source: 'note', url: 'https://note.com/otoneko1102/rss' },
 ];
 
-const DESCRIPTION_LENGTH = 140;
-
 type XmlValue = string | number | { '#text'?: unknown; '@_href'?: unknown; '@_rel'?: unknown } | XmlValue[] | undefined;
 
 function text(value: XmlValue): string {
@@ -38,7 +36,7 @@ function link(value: XmlValue): string {
 const ENTITIES: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' };
 
 function plain(html: string) {
-	const stripped = html
+	return html
 		.replace(/<[^>]*>/g, ' ')
 		.replace(/&(#x?[0-9a-f]+|\w+);/gi, (entity, code: string) => {
 			if (code.startsWith('#x') || code.startsWith('#X')) return String.fromCodePoint(Number.parseInt(code.slice(2), 16));
@@ -47,7 +45,6 @@ function plain(html: string) {
 		})
 		.replace(/\s+/g, ' ')
 		.trim();
-	return stripped.length > DESCRIPTION_LENGTH ? `${stripped.slice(0, DESCRIPTION_LENGTH)}…` : stripped;
 }
 
 function isoDate(value: string) {
@@ -94,6 +91,7 @@ async function fetchPosts(limit: number) {
 	return posts.sort((a, b) => b.date.localeCompare(a.date)).slice(0, limit);
 }
 
-export function getPosts(limit = 12) {
+/** The newest 30 posts, as portfolio-v3 showed. */
+export function getPosts(limit = 30) {
 	return cached(`posts:${limit}`, CACHE_SECONDS, () => fetchPosts(limit));
 }
