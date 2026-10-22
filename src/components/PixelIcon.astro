@@ -1,0 +1,26 @@
+---
+import { pixelIcons, type PixelIconName } from '@/data/pixel-icons';
+import { pixelPaths } from '@/lib/pixel-path';
+
+interface Props {
+	name: PixelIconName;
+	/** Rendered size of one source pixel, in CSS pixels. */
+	scale?: number;
+}
+
+const { name, scale = 3 } = Astro.props;
+const icon = pixelIcons[name];
+const size = 16 * scale;
+---
+
+<svg
+	class="pixel-icon"
+	width={size}
+	height={size}
+	viewBox="0 0 16 16"
+	shape-rendering="crispEdges"
+	role="img"
+	aria-label={icon.label}
+>
+	{pixelPaths(icon.rows, icon.colors).map((path) => <path fill={path.fill} d={path.d} />)}
+</svg>
