@@ -26,6 +26,7 @@ src/
 │   │   ├── CrossLinksWindow.astro   相互リンク、申請、このサイトのバナー
 │   │   ├── TramStop.astro           岸壁と市電の通り。otoneko.cat への入口
 │   │   ├── LanguageBar.astro        言語の割合のバー
+│   │   ├── StatsColumn.astro        スター、マージ済み PR、Issue の数 (ドット絵のアイコン付き)
 │   │   └── Window.astro             ウィンドウ枠と開くアニメーション
 │   ├── Octocat.astro            手を振る octocat
 │   └── PixelIcon.astro          16x16 のドット絵アイコン
@@ -75,8 +76,8 @@ Pages の環境変数 `GITHUB_TOKEN` があるかどうかで取り方を変え�
 | セクション | トークンあり (`github.ts`、GraphQL) | トークンなし (`github-public.ts`、portfolio-v3 と同じ取り方) |
 | --- | --- | --- |
 | 統計 | `user` の followers、自分の公開リポジトリ (フォーク以外) の数とスターの合計と言語ごとのバイト数、`contributionsCollection` (年ごとのエイリアスで全期間を合計、直近31日) | REST の `/users/otnc` と `/users/otnc/repos`、github.com のコントリビューションのカレンダー (年ごと)。言語はリポジトリの大きさを主言語に足すだけなので、割合はおおよそ |
-| Works | `pinnedItems` | pinned.berrysauce.dev、Website 欄はリポジトリ一覧、言語は REST の `/languages` |
-| Contributions | `search` (`type:pr author:otnc is:merged -user:otnc`)。スター数と言語は検索結果に付いてくる | REST の検索 (最大2ページ) と ungh.cc のスター数。言語は出さない |
+| Works | `pinnedItems` と、スター順の自分のリポジトリ (ピン留め以外の上位9件)。リポジトリ全体のマージ済み PR 数と Issue 数も取る | pinned.berrysauce.dev と REST のリポジトリ一覧。ピン留め以外は主言語だけで、PR 数と Issue 数は出さない (`-`) |
+| Contributions | `search` で `type:pr author:otnc is:merged -user:otnc` と `type:issue author:otnc -user:otnc` を検索し、リポジトリごとにマージ済み PR と Issue を数える。スター数と言語は検索結果に付いてくる | REST の検索 (最大10ページずつ) と ungh.cc のスター数。言語は出さない |
 
 GraphQL にしたのは、リクエスト数を抑えるためです。Pages の Worker は1リクエストあたりの外部リクエスト数に上限があり、REST の Search API には短時間の連続呼び出しの制限 (secondary rate limit) もあります。トークンなしの取り方は外部リクエストが多く、未認証の REST は IP ごとに1時間60回までなので、本番ではトークンを設定します。
 

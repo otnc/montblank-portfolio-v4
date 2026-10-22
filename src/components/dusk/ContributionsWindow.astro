@@ -1,7 +1,7 @@
 ---
 import LanguageBar from '@/components/dusk/LanguageBar.astro';
+import StatsColumn from '@/components/dusk/StatsColumn.astro';
 import Window from '@/components/dusk/Window.astro';
-import { formatCompact } from '@/lib/format';
 import type { Contribution } from '@/lib/github';
 
 interface Props {
@@ -9,8 +9,6 @@ interface Props {
 }
 
 const { contributions } = Astro.props;
-// As in portfolio-v3, a count of none (or one that could not be read) shows as "-".
-const count = (value: number | null) => (value ? formatCompact(value) : '-');
 ---
 
 <Window title="contributions.txt" class="window--left">
@@ -20,19 +18,15 @@ const count = (value: number | null) => (value ? formatCompact(value) : '-');
 		contributions && contributions.length > 0 ? (
 			<ul class="repos">
 				{contributions.map((repo) => (
-					<li>
-						<a class="repo" href={repo.url} target="_blank" rel="noreferrer">
-							<span class="repo__name">
+					<li class="repo">
+						<div class="repo__text">
+							<a class="repo__name" href={repo.url} target="_blank" rel="noreferrer">
 								<span class="muted">{repo.owner}/</span>
 								{repo.name}
-							</span>
-							<span class="repo__counts">
-								<span title="Stars"><span>★</span><span>{count(repo.stars)}</span></span>
-								<span title="Merged pull requests"><span>PR</span><span>{count(repo.mergedCount)}</span></span>
-								<span title="Issues opened"><span>Issue</span><span>{count(repo.issueCount)}</span></span>
-							</span>
-						</a>
-						<LanguageBar languages={repo.languages} labelled={3} />
+							</a>
+							<LanguageBar languages={repo.languages.slice(0, 3)} />
+						</div>
+						<StatsColumn stars={repo.stars} merged={repo.mergedCount} issues={repo.issueCount} />
 					</li>
 				))}
 			</ul>
@@ -45,49 +39,40 @@ const count = (value: number | null) => (value ? formatCompact(value) : '-');
 </Window>
 
 <style>
+	/* A scrolling list, one repository per row, with its counts in a column on the right. */
 	.repos {
 		display: grid;
-		gap: 16px;
 		margin-top: 12px;
-		max-height: 640px;
+		max-height: 660px;
 		overflow-y: auto;
 	}
 
 	.repo {
 		display: flex;
-		flex-wrap: wrap;
-		align-items: baseline;
-		justify-content: space-between;
-		gap: 0 16px;
-		padding: 2px 8px;
-		color: var(--ink);
-		text-decoration: none;
+		align-items: center;
+		gap: 16px;
+		padding: 12px 8px;
+		border-bottom: 3px dashed var(--marron-light);
+	}
+
+	.repo:last-child {
+		border-bottom: none;
 	}
 
 	.repo:hover,
-	.repo:focus-visible {
+	.repo:focus-within {
 		background: var(--marron-light);
 	}
 
-	.repo__name {
-		min-width: 0;
-		overflow-wrap: anywhere;
-		text-decoration: underline;
-	}
-
-	/* Fixed, right-aligned columns, so stars, pull requests and issues line up from row to row. */
-	.repo__counts {
+	.repo__text {
 		display: grid;
-		grid-template-columns: 100px 70px 90px;
-		gap: 0 30px;
-		margin-left: auto;
-		white-space: nowrap;
+		flex: 1;
+		gap: 6px;
+		min-width: 0;
 	}
 
-	/* Label on the left, number on the right of each column. */
-	.repo__counts > span {
-		display: flex;
-		justify-content: space-between;
-		gap: 6px;
+	.repo__name {
+		color: var(--ink);
+		overflow-wrap: anywhere;
 	}
 </style>

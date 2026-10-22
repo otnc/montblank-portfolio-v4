@@ -37,6 +37,7 @@ function shares(sizes: Record<string, number>, colors: Record<string, string>): 
 
 interface RestRepo {
 	name: string;
+	description: string | null;
 	fork: boolean;
 	stargazers_count: number;
 	language: string | null;
@@ -45,14 +46,14 @@ interface RestRepo {
 }
 
 function ownRepos(login: string) {
-	return cached(`rest-repos:${login}`, CACHE_SECONDS, async () => {
+	return cached(`rest-repos-v2:${login}`, CACHE_SECONDS, async () => {
 		const repos: RestRepo[] = [];
 		for (let page = 1; page <= 3; page += 1) {
 			const batch = await getJson<RestRepo[]>(`${API}/users/${login}/repos?type=owner&per_page=100&page=${page}`);
 			repos.push(...batch);
 			if (batch.length < 100) break;
 		}
-		return repos.map(({ name, fork, stargazers_count, language, size, homepage }) => ({ name, fork, stargazers_count, language, size, homepage }));
+		return repos.map(({ name, description, fork, stargazers_count, language, size, homepage }) => ({ name, description, fork, stargazers_count, language, size, homepage }));
 	});
 }
 
@@ -118,15 +119,22 @@ interface PinnedItem {
 	stars?: number;
 }
 
+// After the pinned ones, as many of the most starred repositories as portfolio-v3 showed.
+const OTHER_WORKS = 9;
+
+/**
+ * The pinned repositories, then the most starred of the rest, as portfolio-v3 listed works.
+ * Without a token the merged pull request and issue counts are unknown, and the other works only have their main language.
+ */
 export function getPublicWorks(login: string) {
-	return cached(`public-works:${login}`, CACHE_SECONDS, async (): Promise<Work[]> => {
+	return cached(`public-works-v2:${login}`, CACHE_SECONDS, async (): Promise<Work[]> => {
 		const [pinned, repos, colors] = await Promise.all([
 			getJson<PinnedItem[]>(`${PINNED_API_URL}/${login}`, { 'User-Agent': 'montblank.fun' }),
 			ownRepos(login).catch(() => []),
 			languageColors(),
 		]);
 		const homepages = new Map(repos.map((repo) => [repo.name, repo.homepage]));
-		return Promise.all(
+		const pinnedWorks: Work[] = await Promise.all(
 			pinned.map(async (item) => {
 				const owner = item.author ?? login;
 				const name = item.name ?? '';
@@ -143,10 +151,31 @@ export function getPublicWorks(login: string) {
 					description: item.description ?? '',
 					homepage: homepage || undefined,
 					stars: item.stars ?? 0,
+					mergedCount: null,
+					issueCount: null,
+					pinned: true,
 					languages: shares(sizes, colors),
 				};
 			}),
 		);
+		const pinnedUrls = new Set(pinnedWorks.map((work) => work.url));
+		const others: Work[] = repos
+			.filter((repo) => !repo.fork && !pinnedUrls.has(`https://github.com/${login}/${repo.name}`))
+			.sort((a, b) => b.stargazers_count - a.stargazers_count)
+			.slice(0, OTHER_WORKS)
+			.map((repo) => ({
+				name: repo.name,
+				owner: login,
+				url: `https://github.com/${login}/${repo.name}`,
+				description: repo.description ?? '',
+				homepage: repo.homepage || undefined,
+				stars: repo.stargazers_count,
+				mergedCount: null,
+				issueCount: null,
+				pinned: false,
+				languages: repo.language ? [{ name: repo.language, color: colors[repo.language] ?? FALLBACK_LANGUAGE_COLOR }] : [],
+			}));
+		return [...pinnedWorks, ...others];
 	});
 }
 

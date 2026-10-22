@@ -8,8 +8,8 @@ const FALLBACK_LANGUAGE_COLOR = '#8b8b8b';
 export interface LanguageShare {
 	name: string;
 	color: string;
-	/** 0 to 100. */
-	percentage: number;
+	/** 0 to 100, or left out when only the main language is known. */
+	percentage?: number;
 }
 
 export interface GithubStats {
@@ -30,6 +30,11 @@ export interface Work {
 	/** The repository's "Website" field on GitHub, if set. */
 	homepage?: string;
 	stars: number;
+	/** Merged pull requests and issues in the whole repository (by anyone), `null` when unknown. */
+	mergedCount: number | null;
+	issueCount: number | null;
+	/** Pinned on the GitHub profile; pinned works come first. */
+	pinned: boolean;
 	languages: LanguageShare[];
 }
 
@@ -211,31 +216,53 @@ interface RepositoryNode {
 	homepageUrl: string | null;
 	stargazerCount: number;
 	languages: LanguageEdges;
+	pullRequests: { totalCount: number };
+	issues: { totalCount: number };
 }
 
-const REPOSITORY_FIELDS = `name url owner { login } description homepageUrl stargazerCount ${LANGUAGES_FIELD}`;
+const REPOSITORY_FIELDS = `name url owner { login } description homepageUrl stargazerCount ${LANGUAGES_FIELD} pullRequests(states: MERGED) { totalCount } issues { totalCount }`;
+// After the pinned ones, as many of the most starred repositories as portfolio-v3 showed.
+const OTHER_WORKS = 9;
 
-/** Pinned repositories in the order shown on the GitHub profile. */
+const toWork = (repository: RepositoryNode, pinned: boolean): Work => ({
+	name: repository.name,
+	owner: repository.owner.login,
+	url: repository.url,
+	description: repository.description ?? '',
+	homepage: repository.homepageUrl || undefined,
+	stars: repository.stargazerCount,
+	mergedCount: repository.pullRequests.totalCount,
+	issueCount: repository.issues.totalCount,
+	pinned,
+	languages: languageShares(repository.languages),
+});
+
+/** The pinned repositories in profile order, then the most starred of the rest, as portfolio-v3 listed works. */
 async function fetchWorks(token: string, login: string): Promise<Work[]> {
-	const data = await graphql<{ user: { pinnedItems: { nodes: RepositoryNode[] } } }>(
+	const data = await graphql<{ user: { pinnedItems: { nodes: RepositoryNode[] }; repositories: { nodes: RepositoryNode[] } } }>(
 		token,
-		`query ($login: String!) { user(login: $login) { pinnedItems(first: 6, types: REPOSITORY) { nodes { ... on Repository { ${REPOSITORY_FIELDS} } } } } }`,
+		`query ($login: String!) {
+			user(login: $login) {
+				pinnedItems(first: 6, types: REPOSITORY) { nodes { ... on Repository { ${REPOSITORY_FIELDS} } } }
+				repositories(first: 20, ownerAffiliations: OWNER, privacy: PUBLIC, isFork: false, orderBy: { field: STARGAZERS, direction: DESC }) {
+					nodes { ${REPOSITORY_FIELDS} }
+				}
+			}
+		}`,
 		{ login },
 	);
-	return data.user.pinnedItems.nodes.map((repository) => ({
-		name: repository.name,
-		owner: repository.owner.login,
-		url: repository.url,
-		description: repository.description ?? '',
-		homepage: repository.homepageUrl || undefined,
-		stars: repository.stargazerCount,
-		languages: languageShares(repository.languages),
-	}));
+	const pinned = data.user.pinnedItems.nodes.map((repository) => toWork(repository, true));
+	const pinnedUrls = new Set(pinned.map((work) => work.url));
+	const others = data.user.repositories.nodes
+		.filter((repository) => !pinnedUrls.has(repository.url))
+		.slice(0, OTHER_WORKS)
+		.map((repository) => toWork(repository, false));
+	return [...pinned, ...others];
 }
 
 export function getWorks(token: string | undefined, login: string) {
 	if (!token) return getPublicWorks(login);
-	return cached(`github-works:${login}`, CACHE_SECONDS, () => fetchWorks(token, login));
+	return cached(`github-works-v2:${login}`, CACHE_SECONDS, () => fetchWorks(token, login));
 }
 
 // ---- Contributions ----

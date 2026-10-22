@@ -1,10 +1,11 @@
 ---
 import LanguageBar from '@/components/dusk/LanguageBar.astro';
+import StatsColumn from '@/components/dusk/StatsColumn.astro';
 import Window from '@/components/dusk/Window.astro';
 import Octocat from '@/components/Octocat.astro';
 import { profile } from '@/data/profile';
-import { formatCompact } from '@/lib/format';
 import type { Work } from '@/lib/github';
+import { spriteSvg } from '@/lib/pixel-grid';
 
 interface Props {
 	works: Work[] | null;
@@ -12,6 +13,7 @@ interface Props {
 
 const { works } = Astro.props;
 const repositoriesUrl = `https://github.com/${profile.handle}?tab=repositories`;
+const pin = spriteSvg(['..ppp..', '..ppp..', '..ppp..', '.ppppp.', '...p...', '...p...', '...p...'], { p: '#c8442f' });
 ---
 
 <Window title={`/${profile.handle}/works/`} class="window--right">
@@ -21,22 +23,33 @@ const repositoriesUrl = `https://github.com/${profile.handle}?tab=repositories`;
 			<ul class="works">
 				{works.map((work) => (
 					<li class="work">
-						<h3>{work.owner === profile.handle ? work.name : `${work.owner}/${work.name}`}</h3>
-						<p class="work__desc" title={work.description}>
-							{work.description}
-						</p>
-						<LanguageBar languages={work.languages} />
-						<p class="work__links">
-							<span class="muted">★ {formatCompact(work.stars)}</span>
-							{work.homepage && (
-								<a href={work.homepage} target="_blank" rel="noreferrer">
-									Link
+						<div class="work__text">
+							<h3>
+								{work.pinned && (
+									<span class="work__pin" title="Pinned">
+										<Fragment set:html={pin} />
+										<span class="visually-hidden">Pinned</span>
+									</span>
+								)}
+								<a href={work.url} target="_blank" rel="noreferrer">
+									{work.owner === profile.handle ? work.name : `${work.owner}/${work.name}`}
 								</a>
+							</h3>
+							{work.description && (
+								<p class="work__desc" title={work.description}>
+									{work.description}
+								</p>
 							)}
-							<a href={work.url} target="_blank" rel="noreferrer">
-								GitHub
-							</a>
-						</p>
+							<LanguageBar languages={work.languages.slice(0, 3)} />
+							{work.homepage && (
+								<p class="work__links">
+									<a href={work.homepage} target="_blank" rel="noreferrer">
+										Link
+									</a>
+								</p>
+							)}
+						</div>
+						<StatsColumn stars={work.stars} merged={work.mergedCount} issues={work.issueCount} />
 					</li>
 				))}
 			</ul>
@@ -51,33 +64,54 @@ const repositoriesUrl = `https://github.com/${profile.handle}?tab=repositories`;
 </Window>
 
 <style>
+	/* A scrolling list, one repository per row, with its counts in a column on the right. */
 	.works {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-		gap: 16px;
 		margin-top: 8px;
+		max-height: 660px;
+		overflow-y: auto;
 	}
 
 	.work {
-		display: grid;
-		align-content: start;
-		gap: 8px;
-		padding: 12px;
-		outline: 2px dashed var(--muted);
-		outline-offset: -2px;
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		padding: 12px 8px;
+		border-bottom: 3px dashed var(--marron-light);
+	}
+
+	.work:last-child {
+		border-bottom: none;
 	}
 
 	.work:hover,
 	.work:focus-within {
 		background: var(--marron-light);
-		outline-color: var(--ink);
+	}
+
+	.work__text {
+		display: grid;
+		flex: 1;
+		gap: 6px;
+		min-width: 0;
 	}
 
 	.work h3 {
+		display: flex;
+		align-items: center;
+		gap: 6px;
 		overflow-wrap: anywhere;
 	}
 
-	/* Descriptions come from GitHub and vary in length, so keep every card to two lines. */
+	.work h3 a {
+		color: var(--ink);
+	}
+
+	.work__pin :global(svg) {
+		display: block;
+	}
+
+	/* Descriptions come from GitHub and vary in length, so keep every row to two lines. */
 	.work__desc {
 		display: -webkit-box;
 		-webkit-box-orient: vertical;
@@ -85,11 +119,6 @@ const repositoriesUrl = `https://github.com/${profile.handle}?tab=repositories`;
 		line-clamp: 2;
 		overflow: hidden;
 		overflow-wrap: anywhere;
-	}
-
-	.work__links {
-		display: flex;
-		gap: 16px;
 	}
 
 	.more {

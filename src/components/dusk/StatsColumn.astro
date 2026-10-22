@@ -1,0 +1,75 @@
+---
+/**
+ * Stars, merged pull requests and issues stacked on the right of a repository row, as portfolio-v3 showed them,
+ * each with its own pixel icon. A count of none, or one that is unknown, shows as "-".
+ */
+import { formatCompact, formatCount } from '@/lib/format';
+import { spriteSvg } from '@/lib/pixel-grid';
+
+interface Props {
+	stars: number | null;
+	merged: number | null;
+	issues: number | null;
+}
+
+const { stars, merged, issues } = Astro.props;
+
+const icons = {
+	star: spriteSvg(['...s...', '...s...', 'sssssss', '.sssss.', '..sss..', '.ss.ss.', 's.....s'], { s: '#e8b23a' }),
+	// Two branches joining: the git-merge mark.
+	merge: spriteSvg(
+		['.o.......', 'ooo......', '.o.......', '.o...o...', '.ooooooo.', '.o...o...', '.o.......', 'ooo......', '.o.......'],
+		{ o: '#7a5ad0' },
+	),
+	issue: spriteSvg(['..ggg..', '.g...g.', 'g.....g', 'g..g..g', 'g.....g', '.g...g.', '..ggg..'], { g: '#4f9a5a' }),
+};
+
+const stats = [
+	{ icon: icons.star, value: stars, label: 'stars' },
+	{ icon: icons.merge, value: merged, label: 'merged pull requests' },
+	{ icon: icons.issue, value: issues, label: 'issues' },
+];
+---
+
+<dl class="stats">
+	{
+		stats.map((stat) => (
+			<div title={stat.value ? `${formatCount(stat.value)} ${stat.label}` : undefined}>
+				<dt>
+					<Fragment set:html={stat.icon} />
+					<span class="visually-hidden">{stat.label}</span>
+				</dt>
+				<dd>{stat.value ? formatCompact(stat.value) : '-'}</dd>
+			</div>
+		))
+	}
+</dl>
+
+<style>
+	.stats {
+		display: grid;
+		flex: none;
+		margin: 0;
+	}
+
+	.stats div {
+		display: grid;
+		grid-template-columns: 27px 60px;
+		align-items: center;
+		gap: 6px;
+	}
+
+	.stats dt {
+		display: grid;
+		place-items: center;
+	}
+
+	.stats dt :global(svg) {
+		display: block;
+	}
+
+	.stats dd {
+		margin: 0;
+		text-align: right;
+	}
+</style>

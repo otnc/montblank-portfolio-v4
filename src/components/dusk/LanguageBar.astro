@@ -16,14 +16,15 @@ const percent = (value: number) => (value >= 10 ? value.toFixed(0) : value.toFix
 		<div class="languages">
 			<div class="languages__bar" aria-hidden="true">
 				{languages.map((language) => (
-					<span style={`flex-grow:${language.percentage};background:${language.color}`} />
+					<span style={`flex-grow:${language.percentage ?? 1};background:${language.color}`} />
 				))}
 			</div>
 			<ul class="languages__list">
 				{languages.slice(0, labelled).map((language) => (
 					<li>
 						<span class="languages__dot" style={`background:${language.color}`} />
-						{language.name} <span class="muted">{percent(language.percentage)}%</span>
+						{language.name}
+						{language.percentage !== undefined && <span class="muted">{percent(language.percentage)}%</span>}
 					</li>
 				))}
 			</ul>
