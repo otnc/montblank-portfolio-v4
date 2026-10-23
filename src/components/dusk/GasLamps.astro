@@ -1,0 +1,113 @@
+---
+/**
+ * Old gas lamps along both edges of the stone path, like the street lamps of the bay area.
+ * Each lamp lights up the first time it scrolls into view and stays lit.
+ * They stand on the kerbs at the edges of the path, so they only show where the path has room beside the windows.
+ */
+import { spriteSvg } from '@/lib/pixel-grid';
+
+// A black post with a lantern: finial, roof, four-sided glass (lit separately), collar, post, and a stepped base.
+const LAMP = [
+	'....k....',
+	'...kkk...',
+	'..kkkkk..',
+	'.kkkkkkk.',
+	'.k.....k.',
+	'.k.....k.',
+	'.k.....k.',
+	'.k.....k.',
+	'..kkkkk..',
+	'...kkk...',
+	'....k....',
+	'...kkk...',
+	'....k....',
+	'....k....',
+	'....k....',
+	'....k....',
+	'....k....',
+	'....k....',
+	'....k....',
+	'....k....',
+	'....k....',
+	'....k....',
+	'....k....',
+	'....k....',
+	'...kkk...',
+	'...kkk...',
+	'..kkkkk..',
+	'.kkkkkkk.',
+];
+const lamp = spriteSvg(LAMP, { k: '#1e1820' });
+// One lamp on each side every few percent of the page height, offset between the sides.
+const rows = Array.from({ length: 14 }, (_, index) => index);
+---
+
+<div class="lamps" aria-hidden="true">
+	{
+		rows.map((index) => (
+			<>
+				<span class="lamp lamp--left" style={`top:${3 + index * 7}%`} data-light>
+					<Fragment set:html={lamp} />
+					<span class="lamp__glass" />
+				</span>
+				<span class="lamp lamp--right" style={`top:${6.5 + index * 7}%`} data-light>
+					<Fragment set:html={lamp} />
+					<span class="lamp__glass" />
+				</span>
+			</>
+		))
+	}
+</div>
+
+<style>
+	.lamps {
+		position: absolute;
+		inset: 0;
+		overflow: clip;
+		pointer-events: none;
+	}
+
+	/* Centred on the 12px kerbs at the edges of the 1100px path (the lamp is 27px wide). */
+	.lamp {
+		position: absolute;
+	}
+
+	.lamp--left {
+		left: calc(50% - 557px);
+	}
+
+	.lamp--right {
+		right: calc(50% - 557px);
+	}
+
+	.lamp :global(svg) {
+		display: block;
+	}
+
+	/* The glass inside the lantern: dark until the lamp is first seen, then warm with a stepped halo. */
+	.lamp__glass {
+		position: absolute;
+		left: 6px;
+		top: 12px;
+		width: 15px;
+		height: 12px;
+		background: #4a3a30;
+	}
+
+	:global(.js) .lamp.is-visible .lamp__glass,
+	:global(html:not(.js)) .lamp__glass {
+		background: #ffe7a0;
+		box-shadow:
+			0 0 0 6px #ffd27a33,
+			0 0 0 15px #ffd27a14;
+		transition:
+			background 0.3s steps(1),
+			box-shadow 0.3s steps(1);
+	}
+
+	@media (max-width: 1140px) {
+		.lamps {
+			display: none;
+		}
+	}
+</style>
