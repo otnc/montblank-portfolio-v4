@@ -83,6 +83,12 @@ export const careerCategoryLabels: Record<CareerCategory, string> = {
 // Newest first.
 export const career: CareerItem[] = [
 	{
+		date: '2026/10',
+		category: 'project',
+		lines: ['JPHACKS 2026 札幌予選', '参加'],
+		url: 'https://fllooat.mfmf.moe',
+	},
+	{
 		date: '2026/09',
 		category: 'work',
 		lines: ['フェンリル株式会社', '2026年度サマーインターンシップ 参加'],
@@ -101,6 +107,7 @@ export const career: CareerItem[] = [
 		url: 'https://universe.mfmf.moe',
 	},
 	{ date: '2025/11', category: 'work', lines: ['株式会社函館ラボラトリ', '開発バイト開始'] },
+	{ date: '2025/09', category: 'project', lines: ['Engineer Guild Hackathon', '参加'] },
 	{ date: '2025/04', category: 'work', lines: ['公立はこだて未来大学 入学'] },
 	{ date: '2025/03', category: 'work', lines: ['北海道岩見沢東高等学校 卒業'] },
 	{ date: '2023/07', category: 'project', lines: ['OSS活動 開始'] },
