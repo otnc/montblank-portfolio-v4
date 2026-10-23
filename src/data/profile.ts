@@ -86,7 +86,7 @@ export const career: CareerItem[] = [
 		date: '2026/10',
 		category: 'project',
 		lines: ['JPHACKS 2026 札幌予選', '参加'],
-		url: 'https://fllooat.mfmf.moe',
+		// url: 'https://fllooat.mfmf.moe',
 	},
 	{
 		date: '2026/09',
