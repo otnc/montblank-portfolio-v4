@@ -15,23 +15,25 @@ const hostname = (url: string) => new URL(url).hostname;
 
 <Window title="cross-links.txt" class="window--right">
 	<h2>Cross Links</h2>
-	<ul class="partners">
-		{
-			crossLinks.map((link) => (
-				<li>
-					<a href={link.url} target="_blank" rel="noreferrer">
-						{link.banner && (
-							<img src={link.banner.src} width={link.banner.width / 2} height={link.banner.height / 2} alt="" loading="lazy" />
-						)}
-						<span class="partners__text">
-							<span class="partners__name">{link.author}</span>
-							<span class="muted">{hostname(link.url)}</span>
-						</span>
-					</a>
-				</li>
-			))
-		}
-	</ul>
+	<div class="partners-box">
+		<ul class="partners">
+			{
+				crossLinks.map((link) => (
+					<li class:list={[{ 'partners__wide': link.banner && link.banner.width > link.banner.height * 1.5 }]}>
+						<a href={link.url} target="_blank" rel="noreferrer">
+							{link.banner && (
+								<img src={link.banner.src} width={link.banner.width / 2} height={link.banner.height / 2} alt="" loading="lazy" />
+							)}
+							<span class="partners__text">
+								<span class="partners__name">{link.author}</span>
+								<span class="muted">{hostname(link.url)}</span>
+							</span>
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</div>
 
 	<h3 class="section-gap">相互リンクの申請</h3>
 	<p class="request"><a class="pixel-button" href={crossLinkRequest.url} target="_blank" rel="noreferrer">Request</a></p>
@@ -59,6 +61,10 @@ const hostname = (url: string) => new URL(url).hostname;
 </Window>
 
 <style>
+	.partners-box {
+		container-type: inline-size;
+	}
+
 	.partners {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
@@ -75,11 +81,20 @@ const hostname = (url: string) => new URL(url).hostname;
 		text-decoration: none;
 	}
 
+	/* A wide banner takes two columns, so a row holds at most two partners when one of them has one. */
+	@container (min-width: 600px) {
+		.partners__wide {
+			grid-column: span 2;
+		}
+	}
+
 	/* Their images are photos and illustrations, not pixel art, so they keep smooth scaling. */
 	.partners img {
 		flex: none;
 		height: 60px;
 		width: auto;
+		max-width: 60%;
+		object-fit: contain;
 		outline: 3px solid var(--ink);
 		transition: transform 0.12s steps(2);
 	}
