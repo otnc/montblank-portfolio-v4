@@ -1,0 +1,6 @@
+# Copy to .dev.vars for `npm run dev`. wrangler hands these to the site as the Pages environment, the same as in production.
+# .dev.vars is git-ignored; never commit a real token.
+
+# A GitHub token for the GraphQL API. A classic token with no scopes, or a fine-grained token with read access to public repositories, is enough.
+# Without it the site falls back to the token-less sources in src/lib/github-public.ts.
+GITHUB_TOKEN=

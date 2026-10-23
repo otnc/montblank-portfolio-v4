@@ -10,11 +10,13 @@ npm run build    # フォントと画像を生成してから astro build
 
 Node.js は 22.12 以上が必要です (Astro 7 の要件)。
 
-手元では GitHub のトークンなしでも動きます (`src/lib/github-public.ts`)。本番と同じ GraphQL で確かめるときは、リポジトリ直下に `.dev.vars` (git 管理外) を置きます。
+手元の GitHub トークンは、リポジトリ直下の `.dev.vars` (git 管理外) に置きます。`npm run dev` のとき wrangler がこのファイルを Pages の環境変数として渡すので、本番と同じ GraphQL の取り方で確かめられます。ひな形は [.dev.vars.example](../.dev.vars.example) です。
 
 ```sh
-GITHUB_TOKEN=github_pat_...
+cp .dev.vars.example .dev.vars   # GITHUB_TOKEN= のあとにトークンを書く
 ```
+
+`.env` ではなく `.dev.vars` に置くのは、Astro が `.env` の値をビルド時に Worker のコードへ埋め込むことがあるためです。トークンがないときは、トークンなしの取り方 (`src/lib/github-public.ts`) で動きます。
 
 ## デプロイ
 
@@ -35,13 +37,17 @@ Pages プロジェクトは直接アップロード型なので、Cloudflare 側
 
 | 名前 | 必須 | 用途 |
 | --- | --- | --- |
-| `GITHUB_TOKEN` | 推奨 | GitHub GraphQL API のトークン。読み取り専用の fine-grained token (公開リポジトリの読み取りだけ) で足りる。ないとトークンなしの取り方になり、言語の割合がおおよそになり、レート制限にもかかりやすい |
+| `GITHUB_TOKEN` | 推奨 | GitHub GraphQL API のトークン。スコープなしの classic token か、公開リポジトリの読み取りだけの fine-grained token で足りる (portfolio-v3 の `server/.env` と同じものでよい)。ないとトークンなしの取り方になり、言語の割合がおおよそになり、Works の PR 数と Issue 数も出ず、レート制限にもかかりやすい |
 
-Secret として登録します。
+Secret として登録します。`devuloper` にログインした wrangler で実行し、聞かれたらトークンを貼り付けます。
 
 ```sh
-npx wrangler pages secret put GITHUB_TOKEN --project-name montblank-portfolio
+npx wrangler pages secret put GITHUB_TOKEN --project-name montblank-portfolio    # 登録・更新
+npx wrangler pages secret list --project-name montblank-portfolio                # 登録されているか確かめる (値は出ない)
+npx wrangler pages secret delete GITHUB_TOKEN --project-name montblank-portfolio # 消す
 ```
+
+次のデプロイから使われます。すぐ反映したいときは `npm run deploy` か、GitHub Actions の Deploy を再実行します。
 
 ## ドメイン
 

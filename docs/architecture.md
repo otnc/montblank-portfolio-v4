@@ -17,6 +17,7 @@ src/
 │   │   ├── Marquee.astro            流れるメッセージ
 │   │   ├── HarborLife.astro         港の水面の波、泳ぐイカ、カモメ
 │   │   ├── StonePath.astro          ウィンドウの下の石畳 (八幡坂の舗装)
+│   │   ├── GasLamps.astro           石畳の道の両端のガス灯
 │   │   ├── AboutWindow.astro        自己紹介、キャッチコピー、趣味・所属など、SNS
 │   │   ├── BlogWindow.astro         記事 (ブログ、Zenn、Qiita、note)
 │   │   ├── GithubWindow.astro       GitHub の統計、全言語の割合、直近31日のグラフ
@@ -75,11 +76,27 @@ Pages の環境変数 `GITHUB_TOKEN` があるかどうかで取り方を変え�
 
 | セクション | トークンあり (`github.ts`、GraphQL) | トークンなし (`github-public.ts`、portfolio-v3 と同じ取り方) |
 | --- | --- | --- |
-| 統計 | `user` の followers、自分の公開リポジトリ (フォーク以外) の数とスターの合計と言語ごとのバイト数、`contributionsCollection` (年ごとのエイリアスで全期間を合計、直近31日) | REST の `/users/otnc` と `/users/otnc/repos`、github.com のコントリビューションのカレンダー (年ごと)。言語はリポジトリの大きさを主言語に足すだけなので、割合はおおよそ |
+| 統計 | `user` の followers、自分の公開リポジトリ (フォーク以外) の数とスターの合計と言語ごとのバイト数、`contributionsCollection` (年ごとのエイリアスで全期間を合計、直近31日) | REST の `/users/otnc` と `/users/otnc/repos`、[github-contributions-api.jogruber.de](https://github-contributions-api.jogruber.de) (全期間の年ごとの合計と日別の数を1回で取れる。落ちていたら github.com のカレンダーを年ごとに読む)。言語はリポジトリの大きさを主言語に足すだけなので、割合はおおよそ |
 | Works | `pinnedItems` と、スター順の自分のリポジトリ (ピン留め以外の上位9件)。リポジトリ全体のマージ済み PR 数と Issue 数も取る | pinned.berrysauce.dev と REST のリポジトリ一覧。ピン留め以外は主言語だけで、PR 数と Issue 数は出さない (`-`) |
 | Contributions | `search` で `type:pr author:otnc is:merged -user:otnc` と `type:issue author:otnc -user:otnc` を検索し、リポジトリごとにマージ済み PR と Issue を数える。スター数と言語は検索結果に付いてくる | REST の検索 (最大10ページずつ) と ungh.cc のスター数。言語は出さない |
 
 GraphQL にしたのは、リクエスト数を抑えるためです。Pages の Worker は1リクエストあたりの外部リクエスト数に上限があり、REST の Search API には短時間の連続呼び出しの制限 (secondary rate limit) もあります。トークンなしの取り方は外部リクエストが多く、未認証の REST は IP ごとに1時間60回までなので、本番ではトークンを設定します。
+
+
+### トークンなしで使える非公式 API (2026-10-23 に調べた結果)
+
+| API | 取れるもの | 使い方 |
+| --- | --- | --- |
+| [pinned.berrysauce.dev](https://pinned.berrysauce.dev) | ピン留めリポジトリ (説明、主言語、スター数) | Works で使う |
+| [ungh.cc](https://ungh.cc) | ユーザー、リポジトリ一覧、リポジトリごとのスター数。キャッシュ付きでレート制限は実質なし。言語、Website 欄、フォークかどうかは取れない | Contributions のスター数で使う |
+| [github-contributions-api.jogruber.de](https://github-contributions-api.jogruber.de) | 全期間の年ごとのコントリビューション数と日別の数 | 統計で使う |
+| gh-pinned-repos.egoist.dev | (Deno Deploy Classic の終了で動いていない) | 使わない |
+
+### ピン留め以外の Works の言語の割合
+
+トークンがあるときは、ピン留めと同じ GraphQL の1回のクエリで全部の言語のバイト数が取れるので、追加の負担なく正確に出しています。
+
+トークンがないときは、ピン留め以外 (9件) は主言語だけにしています。正確に出すには REST の `/languages` を1件ずつ呼ぶ必要があり、キャッシュが切れるたびに9回増えます。未認証の REST は IP ごとに1時間60回まで (Cloudflare では他のサイトと共有) で、Worker の1リクエストあたりの外部リクエスト数 (無料プランは50) も、トークンなしではすでに40前後使っているためです。トークンなしで Contributions のスター数を ungh.cc から取るのを20件までにしているのも、同じ理由です。
 
 ### 足した技術
 

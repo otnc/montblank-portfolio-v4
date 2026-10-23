@@ -52,11 +52,12 @@
 
 - GitHub から取れるデータ (統計、作品、コントリビューション) は手書きしません。リクエスト時に取得します。
 - 作品の説明文は GitHub の Description をそのまま表示し、カードでは2行で省略します。`Link` は GitHub の Website 欄から取ります。
+- 道の両端の縁石の上にガス灯を並べます。点いたら灯ったままにし、点滅させません。
 - Works、Contributions、Blog の件数と並び順は portfolio-v3 に合わせます。Works はピン留め (📌のドット絵) のあとにスター順の上位9件、Contributions はスター数の多い順 (不明は最後、同数なら PR と Issue の合計順)、Blog は新しい順に30件で、1週間以内の記事に New を付けます。
 - スター、マージ済み PR、Issue の数は、行の右側にドット絵のアイコン付きで縦に並べます。数がないときは `-` です。
 - otoneko.cat への入口は、アカウント一覧の1行にせず独立した枠にします。文言は otoneko.cat 側 (`otnc-portfolio-v3` の `src/data/profile.ts` と `BottleMail.astro`) と食い違わないようにします。
 - アクセスカウンターは置きません。
-- SNS は GitHub (otnc、oto-lab)、Twitter、Discord、Misskey、mixi2、Instagram です。WakaTime、SoundCloud、Spotify は載せません。SNS 欄は2列までにします。
+- SNS は GitHub (otnc、oto-lab)、Twitter、Misskey、mixi2、Instagram です。WakaTime、SoundCloud、Spotify、Discord は載せません。SNS 欄は2列までにします。
 - GitHub の言語の割合は全言語を表示します。
 - 並びは今の montblank.fun に合わせなくて構いません。今は Profile (about) の次に Blog を置いています。
 
