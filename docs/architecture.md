@@ -8,7 +8,7 @@ Astro 7 を SSR (`output: 'server'`) で動かし、Cloudflare Pages に置い�
 src/
 ├── pages/index.astro            データを取得し、部品を並べるだけ
 ├── pages/404.astro              見つからないページ
-├── layouts/DuskLayout.astro     <head>、ヘッダー、港の水面と石畳、フッター、共通スクリプト
+├── layouts/DuskLayout.astro     <head>、港の水面と石畳、フッター、共通スクリプト
 ├── components/
 │   ├── dusk/
 │   │   ├── Hero.astro               夕焼けの空、アイコン、名前、SNS アイコン
@@ -19,7 +19,7 @@ src/
 │   │   ├── StonePath.astro          ウィンドウの下の石畳 (八幡坂の舗装)
 │   │   ├── GasLamps.astro           石畳の道の両端のガス灯
 │   │   ├── AboutWindow.astro        自己紹介、キャッチコピー、趣味・所属など、SNS
-│   │   ├── BlogWindow.astro         記事 (ブログ、Zenn、Qiita、note)
+│   │   ├── BlogWindow.astro         記事 (ブログ、Zenn、Qiita、note) と各サイトへのリンク
 │   │   ├── GithubWindow.astro       GitHub の統計、全言語の割合、直近31日のグラフ
 │   │   ├── WorksWindow.astro        作品 (GitHub の pinned)
 │   │   ├── ContributionsWindow.astro  他のリポジトリにマージされた PR

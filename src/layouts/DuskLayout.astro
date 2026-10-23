@@ -1,6 +1,6 @@
 ---
 /**
- * Shared frame for the bay at dusk: <head>, global styles, the header over the hero, the harbour water behind the sections
+ * Shared frame for the bay at dusk: <head>, global styles, the harbour water behind the sections
  * and the quay with the footer at the bottom.
  * Pages put the hero in the `hero` slot and their sections in the default slot.
  */
@@ -9,7 +9,6 @@ import '@/styles/dusk.css';
 import GasLamps from '@/components/dusk/GasLamps.astro';
 import HarborLife from '@/components/dusk/HarborLife.astro';
 import StonePath from '@/components/dusk/StonePath.astro';
-import Header from '@/components/dusk/Header.astro';
 import { SITE_ORIGIN, profile } from '@/data/profile';
 import { spriteSvg } from '@/lib/pixel-grid';
 
@@ -62,7 +61,6 @@ const copyrightSign = spriteSvg(['.ccccc.', 'c.....c', 'c.ccc.c', 'c.c...c', 'c.
 		<a class="skip-link" href="#main">本文へ</a>
 
 		<div class="site">
-			<Header />
 			<slot name="hero" />
 
 			<div class="harbor">

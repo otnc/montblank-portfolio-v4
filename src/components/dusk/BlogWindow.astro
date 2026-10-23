@@ -49,15 +49,18 @@ const isNew = (date: string) => {
 			<p class="notice">記事を読み込めませんでした。</p>
 		)
 	}
-	<p class="more">
+	<ul class="more">
 		{
 			writingSites.map((site) => (
-				<a href={site.url} target="_blank" rel="noreferrer">
-					{site.label}
-				</a>
+				<li>
+					<a href={site.url} target="_blank" rel="noreferrer">
+						<PixelIcon name={site.icon} scale={2} />
+						<span>{site.label}</span>
+					</a>
+				</li>
 			))
 		}
-	</p>
+	</ul>
 </Window>
 
 <style>
@@ -131,10 +134,24 @@ const isNew = (date: string) => {
 		overflow-wrap: anywhere;
 	}
 
+	/* Where each feed comes from, as icon links. */
 	.more {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0 16px;
+		gap: 8px 24px;
 		margin-top: 16px;
+	}
+
+	.more a {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		color: var(--ink);
+		transition: transform 0.12s steps(2);
+	}
+
+	.more a:hover,
+	.more a:focus-visible {
+		transform: translateY(-3px);
 	}
 </style>
