@@ -66,7 +66,15 @@ npx wrangler pages secret delete GITHUB_TOKEN --project-name montblank-portfolio
 | `montblank.fun` | 正規のドメイン |
 | `www.montblank.fun` | `montblank.fun` に 301 |
 
-ゾーン `montblank.fun` は `devuloper` アカウントにあります。今は VPS (nginx) の portfolio-v3 を向いていて、新サイトが公開できる状態になってから DNS を Pages に向け直します。`blog.montblank.fun` など他のサブドメインは触りません。
+ゾーン `montblank.fun` は `devuloper` アカウントにあります。2つとも Pages の Custom domains に登録してあり、DNS は `montblank-portfolio.pages.dev` へのプロキシ付きの CNAME です。
+
+2026-10-23 に、VPS (nginx) の portfolio-v3 から切り替えました。置き換えた DNS レコードは次の通りです。
+
+- `montblank.fun`: `A 5.104.86.48` を CNAME に変更
+- `www.montblank.fun`: `A 5.104.86.48` を CNAME に変更
+- `mail.montblank.fun`: `CNAME montblank.fun` を削除。apex を Pages に向けると一緒に Pages を向いてしまうため。VPS ではメールのポートが閉じていて、メールは MX の `devuloper.sakura.ne.jp` で動いているので、使われていませんでした
+
+`blog.montblank.fun`、`api.montblank.fun` など他のサブドメインと MX、TXT は触っていません。
 
 転送は `src/worker.ts` が Astro より先に行います。`public/_routes.json` でページは全部 Worker を通します。
 
