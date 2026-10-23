@@ -39,8 +39,12 @@ const { contributions } = Astro.props;
 </Window>
 
 <style>
-	/* A scrolling list, one repository per row, with its counts in a column on the right. */
+	/*
+	 * A scrolling list, one repository per row, with its counts in a column on the right.
+	 * It is the positioning context for anything absolute inside, so that scrolls with the list instead of stretching the page.
+	 */
 	.repos {
+		position: relative;
 		display: grid;
 		margin-top: 12px;
 		max-height: 660px;

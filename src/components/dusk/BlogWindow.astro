@@ -61,7 +61,9 @@ const isNew = (date: string) => {
 </Window>
 
 <style>
+	/* The positioning context for anything absolute inside, so it scrolls with the list instead of stretching the page. */
 	.posts {
+		position: relative;
 		display: grid;
 		gap: 4px;
 		margin-top: 8px;
