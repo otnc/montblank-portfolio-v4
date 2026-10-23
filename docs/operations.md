@@ -39,15 +39,25 @@ Pages プロジェクトは直接アップロード型なので、Cloudflare 側
 | --- | --- | --- |
 | `GITHUB_TOKEN` | 推奨 | GitHub GraphQL API のトークン。スコープなしの classic token か、公開リポジトリの読み取りだけの fine-grained token で足りる (portfolio-v3 の `server/.env` と同じものでよい)。ないとトークンなしの取り方になり、言語の割合がおおよそになり、Works の PR 数と Issue 数も出ず、レート制限にもかかりやすい |
 
-Secret として登録します。`devuloper` にログインした wrangler で実行し、聞かれたらトークンを貼り付けます。
+Secret として登録します。`devuloper` にログインした wrangler で次の1行だけを実行し、聞かれたらトークンを貼り付けます。
 
 ```sh
-npx wrangler pages secret put GITHUB_TOKEN --project-name montblank-portfolio    # 登録・更新
-npx wrangler pages secret list --project-name montblank-portfolio                # 登録されているか確かめる (値は出ない)
-npx wrangler pages secret delete GITHUB_TOKEN --project-name montblank-portfolio # 消す
+npx wrangler pages secret put GITHUB_TOKEN --project-name montblank-portfolio
 ```
 
 次のデプロイから使われます。すぐ反映したいときは `npm run deploy` か、GitHub Actions の Deploy を再実行します。
+
+登録されているか確かめるときは次のコマンドです (値は表示されません)。
+
+```sh
+npx wrangler pages secret list --project-name montblank-portfolio
+```
+
+トークンを消すときだけ、次のコマンドを使います。登録のときに続けて実行しないように、ここだけ分けて書いています。
+
+```sh
+npx wrangler pages secret delete GITHUB_TOKEN --project-name montblank-portfolio
+```
 
 ## ドメイン
 
