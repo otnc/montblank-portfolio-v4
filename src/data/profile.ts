@@ -47,7 +47,6 @@ export const accounts: Account[] = [
 	{ label: 'GitHub', handle: 'otnc', url: 'https://github.com/otnc', icon: 'github' },
 	{ label: 'GitHub', handle: 'oto-lab', url: 'https://github.com/oto-lab', icon: 'github' },
 	{ label: 'Twitter', handle: '@rin_montblank', url: 'https://twitter.com/rin_montblank', icon: 'twitter' },
-	{ label: 'Discord', url: 'https://discord.com/users/236727759672442880', icon: 'discord' },
 	{ label: 'Misskey', handle: '@m@misskey.otnc.dev', url: 'https://misskey.otnc.dev/@m', icon: 'misskey' },
 	{ label: 'mixi2', handle: '@rin_montblank', url: 'https://mixi.social/@rin_montblank', icon: 'mixi2' },
 	{ label: 'Instagram', handle: 'rin_montblank', url: 'https://www.instagram.com/rin_montblank/', icon: 'instagram' },
