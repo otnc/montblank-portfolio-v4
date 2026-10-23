@@ -155,7 +155,5 @@ export const crossLinkRequest = {
 // The way back to otoneko.cat, which links here from its bottle mail (otnc-portfolio-v3: src/data/profile.ts `altPersona`).
 export const otherSelf = {
 	name: 'otoneko.',
-	heading: '趣味垢はこちら',
-	summary: 'ネタ駆動の開発は otoneko. でしています。便利なものから、使い道のないただの一発ネタまで。',
 	site: { label: 'otoneko.cat', url: 'https://otoneko.cat' },
 };

@@ -25,7 +25,7 @@ src/
 │   │   ├── ContributionsWindow.astro  他のリポジトリにマージされた PR
 │   │   ├── CareerWindow.astro       経歴
 │   │   ├── CrossLinksWindow.astro   相互リンク、申請、このサイトのバナー
-│   │   ├── TramStop.astro           岸壁と市電の通り。otoneko.cat への入口
+│   │   ├── TramStop.astro           岸壁と市電の通り。市電が otoneko.cat への隠しリンク
 │   │   ├── LanguageBar.astro        言語の割合のバー
 │   │   ├── StatsColumn.astro        スター、マージ済み PR、Issue の数 (ドット絵のアイコン付き)
 │   │   └── Window.astro             ウィンドウ枠と開くアニメーション

@@ -1,7 +1,7 @@
 ---
 /**
  * The way to otoneko.cat, the counterpart of its bottle mail. On the tramway street along the quay, a Hakodate city tram
- * pulls in at the stop from the left.
+ * pulls in at the stop from the left. There is no sign or button: the tram itself is a hidden link to otoneko.cat.
  * The tram is modelled on car 812 of the 800 series, the one kept in the old standard "sasa-iro two-tone" livery:
  * ivory above, bamboo green below, two-leaf doors at the front and in the middle.
  * The street closes the harbour, so this is the last thing on the page.
@@ -53,48 +53,16 @@ const tram = gridSvg(g, 'tram__art');
 ---
 
 <section class="stop">
-	<div class="stop__letter">
-		<h2>{otherSelf.heading}</h2>
-		<p>{otherSelf.summary}</p>
-		<div class="stop__actions">
-			<a class="pixel-button" href={otherSelf.site.url} target="_blank" rel="noreferrer">{otherSelf.site.label} へ</a>
-		</div>
-	</div>
-	<div class="stop__street" aria-hidden="true" data-light>
-		<span class="stop__rails"></span>
-		<span class="stop__pole"><span>電停</span></span>
-		<div class="tram" style={`--w:${W};--h:${H}`}>
+	<div class="stop__street" data-light>
+		<span class="stop__rails" aria-hidden="true"></span>
+		<span class="stop__pole" aria-hidden="true"><span>電停</span></span>
+		<a class="tram" href={otherSelf.site.url} aria-label={otherSelf.site.label} style={`--w:${W};--h:${H}`}>
 			<Fragment set:html={tram} />
-		</div>
+		</a>
 	</div>
 </section>
 
 <style>
-	.stop {
-		display: grid;
-		gap: 48px;
-	}
-
-	.stop__letter {
-		position: relative;
-		z-index: 1;
-		max-width: 720px;
-		padding: 24px;
-		background: var(--paper);
-		color: var(--ink);
-		border: 5px solid var(--ink);
-		border-image: var(--pixel-corner-ink) 3 / 2 / 2 stretch;
-		background-clip: padding-box;
-		filter: drop-shadow(9px 9px 0 #00000055);
-	}
-
-	.stop__actions {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 16px;
-		margin-top: 16px;
-	}
-
 	/* The quay wall of stone blocks, then the tramway street: asphalt, two rails, a kerb on the far side. */
 	.stop__street {
 		position: relative;
@@ -130,13 +98,21 @@ const tram = gridSvg(g, 'tram__art');
 		--stop-x: calc(50% - 168px);
 	}
 
+	/* The tram is the link. Nothing says so; only the pointer and the focus ring give it away. */
 	.tram {
 		position: absolute;
+		display: block;
 		left: var(--stop-x);
 		bottom: 12px;
 		width: calc(var(--w) * 3px);
 		height: calc(var(--h) * 3px);
 		filter: drop-shadow(6px 6px 0 #00000055);
+		cursor: pointer;
+	}
+
+	.tram:focus-visible {
+		outline: 3px dashed var(--cream);
+		outline-offset: 3px;
 	}
 
 	/* The body rattles on its own element, so it never fights the run animation over `translate`. */
