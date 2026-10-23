@@ -1,10 +1,9 @@
 ---
 import PixelIcon from '@/components/PixelIcon.astro';
-import { profile, writingSites } from '@/data/profile';
+import { writingSites } from '@/data/profile';
 ---
 
 <header class="header">
-	<a class="header__logo" href="/">{profile.name}</a>
 	<nav aria-label="記事">
 		<ul class="header__links">
 			{
@@ -31,25 +30,12 @@ import { profile, writingSites } from '@/data/profile';
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
-		justify-content: space-between;
+		justify-content: flex-end;
 		gap: 8px 24px;
 		width: 100%;
 		max-width: 1072px;
 		padding: 16px;
 		translate: -50% 0;
-	}
-
-	.header__logo,
-	.header__links a {
-		color: var(--cream) !important;
-		text-decoration: none;
-		text-shadow: 3px 3px 0 var(--ink);
-	}
-
-	.header__logo {
-		font-family: var(--font-heading);
-		font-size: 24px;
-		line-height: 36px;
 	}
 
 	.header__links {
@@ -59,6 +45,9 @@ import { profile, writingSites } from '@/data/profile';
 	}
 
 	.header__links a {
+		color: var(--cream) !important;
+		text-decoration: none;
+		text-shadow: 3px 3px 0 var(--ink);
 		display: inline-flex;
 		align-items: center;
 		gap: 8px;
