@@ -1,5 +1,5 @@
-// The token-less way to read GitHub, as portfolio-v3 did: the unofficial pinned API, the public REST API (60 calls an hour per IP),
-// ungh.cc for star counts and the contribution calendar on github.com. Used when GITHUB_TOKEN is not set.
+// The token-less way to read GitHub: the unofficial pinned and contributions APIs, the public REST API (60 calls an hour per IP),
+// ungh.cc for star counts, and the contribution calendar on github.com as a fallback. Used when GITHUB_TOKEN is not set.
 import { CACHE_SECONDS, cached } from '@/lib/cache';
 import { sortContributions, type Contribution, type GithubStats, type LanguageShare, type Work } from '@/lib/github';
 
@@ -11,7 +11,7 @@ const COLORS_URL = 'https://raw.githubusercontent.com/ozh/github-colors/master/c
 const FALLBACK_LANGUAGE_COLOR = '#8b8b8b';
 const RECENT_DAYS = 31;
 // ungh.cc is called once per repository, so cap it to stay well under the Worker's subrequest limit.
-const MAX_STAR_LOOKUPS = 30;
+const MAX_STAR_LOOKUPS = 20;
 const HEADERS = { Accept: 'application/vnd.github+json', 'User-Agent': 'montblank.fun' };
 
 async function getJson<T>(url: string, headers: Record<string, string> = HEADERS): Promise<T> {
@@ -59,8 +59,27 @@ function ownRepos(login: string) {
 
 // ---- Stats ----
 
-/** Daily counts and the yearly total from the contribution calendar on a profile page. */
-async function calendarYear(login: string, year: number) {
+/** The unofficial contributions API: every year's total and every day's count in one request. */
+const CONTRIBUTIONS_API_URL = 'https://github-contributions-api.jogruber.de/v4';
+
+interface Calendar {
+	total: number;
+	days: { date: string; count: number }[];
+}
+
+async function contributionsFromApi(login: string): Promise<Calendar> {
+	const data = await getJson<{ total: Record<string, number>; contributions: { date: string; count: number }[] }>(
+		`${CONTRIBUTIONS_API_URL}/${login}?y=all`,
+		{ 'User-Agent': 'montblank.fun' },
+	);
+	return {
+		total: Object.values(data.total).reduce((sum, count) => sum + count, 0),
+		days: data.contributions.map(({ date, count }) => ({ date, count })),
+	};
+}
+
+/** Daily counts and the yearly total from the contribution calendar on a profile page; the fallback when the API above is down. */
+async function calendarYear(login: string, year: number): Promise<Calendar> {
 	const response = await fetch(`https://github.com/users/${login}/contributions?from=${year}-01-01&to=${year}-12-31`, {
 		headers: { 'User-Agent': 'Mozilla/5.0 (compatible; montblank.fun)' },
 	});
@@ -78,30 +97,32 @@ async function calendarYear(login: string, year: number) {
 }
 
 export function getPublicStats(login: string) {
-	return cached(`public-stats:${login}`, CACHE_SECONDS, async (): Promise<GithubStats> => {
+	return cached(`public-stats-v2:${login}`, CACHE_SECONDS, async (): Promise<GithubStats> => {
 		const [user, repos, colors] = await Promise.all([
 			getJson<{ followers: number; created_at: string }>(`${API}/users/${login}`),
 			ownRepos(login),
 			languageColors(),
 		]);
-		const firstYear = new Date(user.created_at).getUTCFullYear();
-		const lastYear = new Date().getUTCFullYear();
-		const years = await Promise.all(
-			Array.from({ length: lastYear - firstYear + 1 }, (_, index) => calendarYear(login, firstYear + index)),
-		);
+		const calendar = await contributionsFromApi(login).catch(async () => {
+			const firstYear = new Date(user.created_at).getUTCFullYear();
+			const lastYear = new Date().getUTCFullYear();
+			const years = await Promise.all(
+				Array.from({ length: lastYear - firstYear + 1 }, (_, index) => calendarYear(login, firstYear + index)),
+			);
+			return { total: years.reduce((sum, year) => sum + year.total, 0), days: years.flatMap((year) => year.days) };
+		});
 		const today = new Date().toISOString().slice(0, 10);
 		const sources = repos.filter((repo) => !repo.fork);
 		// Without per-repository byte counts, each repository's size is credited to its main language.
 		const sizes: Record<string, number> = {};
 		for (const repo of sources) if (repo.language) sizes[repo.language] = (sizes[repo.language] ?? 0) + repo.size;
 		return {
-			totalContributions: years.reduce((sum, year) => sum + year.total, 0),
+			totalContributions: calendar.total,
 			followers: user.followers,
 			publicRepos: sources.length,
 			totalStars: sources.reduce((sum, repo) => sum + repo.stargazers_count, 0),
 			languages: shares(sizes, colors),
-			recentDays: years
-				.flatMap((year) => year.days)
+			recentDays: calendar.days
 				.filter((day) => day.date <= today)
 				.sort((a, b) => a.date.localeCompare(b.date))
 				.slice(-RECENT_DAYS),
