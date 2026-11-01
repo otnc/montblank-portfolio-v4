@@ -22,7 +22,7 @@ const hostname = (url: string) => new URL(url).hostname;
 					<li class:list={[{ 'partners__wide': link.banner && link.banner.width > link.banner.height * 1.5 }]}>
 						<a href={link.url} target="_blank" rel="noreferrer">
 							{link.banner && (
-								<img src={link.banner.src} width={link.banner.width / 2} height={link.banner.height / 2} alt="" loading="lazy" />
+								<img src={link.banner.src} width={link.banner.width / 2} height={link.banner.height / 2} alt="" />
 							)}
 							<span class="partners__text">
 								<span class="partners__name">{link.author}</span>
