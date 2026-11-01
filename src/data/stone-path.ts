@@ -1,4 +1,5 @@
-import { Grid, gridSvg, random } from '@/lib/pixel-grid';
+// The flagstone tile under the windows, served as the static file /pixel/stone-path.svg.
+import { Grid, random } from '@/lib/pixel-grid';
 
 export const TILE_W = 96;
 export const TILE_H = 64;
@@ -12,7 +13,8 @@ const wrapped = (a: number, b: number, size: number) => {
 	const d = Math.abs(a - b);
 	return Math.min(d, size - d);
 };
-const g = new Grid(TILE_W, TILE_H);
+export const stonePath = new Grid(TILE_W, TILE_H);
+const g = stonePath;
 for (let y = 0; y < TILE_H; y += 1) {
 	for (let x = 0; x < TILE_W; x += 1) {
 		let nearest = { d: Infinity, color: '' };
@@ -27,5 +29,3 @@ for (let y = 0; y < TILE_H; y += 1) {
 		g.set(x, y, second - nearest.d < 0.9 ? JOINT : nearest.color);
 	}
 }
-const svg = gridSvg(g).replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ');
-export const tile = `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;

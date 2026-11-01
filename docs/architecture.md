@@ -8,6 +8,7 @@ Astro 7 を SSR (`output: 'server'`) で動かし、Cloudflare Pages に置い�
 src/
 ├── pages/index.astro            データを取得し、部品を並べるだけ
 ├── pages/404.astro              見つからないページ
+├── pages/pixel/[name].svg.ts    ドット絵の SVG をビルド時に dist/pixel/ へ書き出す
 ├── layouts/DuskLayout.astro     <head>、港の水面と石畳、フッター、共通スクリプト
 ├── components/
 │   ├── dusk/
@@ -35,7 +36,12 @@ src/
 ├── data/
 │   ├── profile.ts               名前、自己紹介、所属、経歴、アカウント、相互リンク、otoneko.cat の紹介文
 │   ├── scene.ts                 背景のドット絵の色
-│   └── pixel-icons.ts           アカウントと記事サイトのドット絵、octocat
+│   ├── pixel-icons.ts           アカウントと記事サイトのドット絵、octocat
+│   ├── pixel-files.ts           /pixel/ に静的ファイルとして出すドット絵の一覧
+│   ├── bay-view.ts              函館山、元町、赤レンガ倉庫の景色と、明かりの位置
+│   ├── tram.ts                  市電
+│   ├── stone-path.ts            石畳のタイル
+│   └── sprites.ts               繰り返し出る小さなドット絵 (ガス灯、波、スター、マージ、Issue、ピン)
 ├── lib/
 │   ├── github.ts                GitHub の統計、作品、コントリビューション (トークンがあるとき、GraphQL)
 │   ├── github-public.ts         同じものをトークンなしで取る
@@ -60,7 +66,11 @@ scripts/build-images.mjs         OGP 画像、相互リンク用バナー、favi
 
 ## 背景のドット絵
 
-景色は画像ファイルではなく、`src/lib/pixel-grid.ts` の `Grid` に色を塗って SVG にしています (`BayView`、`TramStop`、`StonePath` など)。1マスが 3px (1ドット) です。同じ色の横並びが上下に続くところは、1つの長方形にまとめて SVG を小さくします。石畳のタイルは `src/data/stone-path.ts` で Worker の初期化時に一度だけ作り、リクエストごとには計算しません。動くもの (窓の明かり、ロープウェイ、波、船、カモメ) は、その上に重ねた要素を CSS の `steps()` で動かします。
+景色は `src/lib/pixel-grid.ts` の `Grid` に色を塗って SVG にしています。1マスが 3px (1ドット) です。同じ色の横並びが上下に続くところは、1つの長方形にまとめて SVG を小さくします。
+
+形が決まっているドット絵 (函館山とベイエリアの景色、市電、石畳、ガス灯、波、スターなどの繰り返し出るアイコン) は、otoneko.cat の `public/pixel/` と同じく静的ファイルにしています。`src/data/pixel-files.ts` に並べたものを `src/pages/pixel/[name].svg.ts` がビルド時に `/pixel/*.svg` として書き出し、部品は `<img>` か CSS の `url()` で読みます。HTML に毎回同じ SVG を入れずに済み、ブラウザもキャッシュできます。`/pixel/*` は `public/_routes.json` で Worker を通しません。ドット絵を足すときは `src/data/` に描き、`pixel-files.ts` に名前を足します。
+
+動くもの (窓の明かり、ロープウェイ、波、船、カモメ) は、その上に重ねた要素を CSS の `steps()` で動かします。
 
 色は `src/data/scene.ts` にまとめています。ヒーローの水面の色とページの水面の色 (`DuskLayout.astro`) は同じ値にして、境目を見せません。
 

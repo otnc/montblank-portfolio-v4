@@ -4,40 +4,6 @@
  * Each lamp lights up the first time it scrolls into view and stays lit.
  * They stand on the kerbs at the edges of the path, so they only show where the path has room beside the windows.
  */
-import { spriteSvg } from '@/lib/pixel-grid';
-
-// A black post with a lantern: finial, roof, four-sided glass (lit separately), collar, post, and a stepped base.
-const LAMP = [
-	'....k....',
-	'...kkk...',
-	'..kkkkk..',
-	'.kkkkkkk.',
-	'.k.....k.',
-	'.k.....k.',
-	'.k.....k.',
-	'.k.....k.',
-	'..kkkkk..',
-	'...kkk...',
-	'....k....',
-	'...kkk...',
-	'....k....',
-	'....k....',
-	'....k....',
-	'....k....',
-	'....k....',
-	'....k....',
-	'....k....',
-	'....k....',
-	'....k....',
-	'....k....',
-	'....k....',
-	'....k....',
-	'...kkk...',
-	'...kkk...',
-	'..kkkkk..',
-	'.kkkkkkk.',
-];
-const lamp = spriteSvg(LAMP, { k: '#1e1820' });
 // One lamp on each side every few percent of the page height, offset between the sides.
 const rows = Array.from({ length: 14 }, (_, index) => index);
 ---
@@ -47,11 +13,11 @@ const rows = Array.from({ length: 14 }, (_, index) => index);
 		rows.map((index) => (
 			<>
 				<span class="lamp lamp--left" style={`top:${3 + index * 7}%`} data-light>
-					<Fragment set:html={lamp} />
+					<img src="/pixel/gas-lamp.svg" width="27" height="84" alt="" />
 					<span class="lamp__glass" />
 				</span>
 				<span class="lamp lamp--right" style={`top:${6.5 + index * 7}%`} data-light>
-					<Fragment set:html={lamp} />
+					<img src="/pixel/gas-lamp.svg" width="27" height="84" alt="" />
 					<span class="lamp__glass" />
 				</span>
 			</>
@@ -80,7 +46,7 @@ const rows = Array.from({ length: 14 }, (_, index) => index);
 		right: calc(50% - 557px);
 	}
 
-	.lamp :global(svg) {
+	.lamp img {
 		display: block;
 	}
 

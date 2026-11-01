@@ -37,19 +37,6 @@ const squid = [
 	spriteSvg([...SQUID_BODY, '....t..t....', '...t.tt.t...', '...t.tt.t...', '....t..t....'], SQUID_PALETTE),
 	spriteSvg([...SQUID_BODY, '...t.tt.t...', '..t..tt..t..', '.t...tt...t.', 't..........t'], SQUID_PALETTE),
 ];
-// A tile of small wave marks scattered over the water, drifted slowly by CSS.
-const WAVE_TILE = [
-	'................................',
-	'...ww.................ww........',
-	'..w..w...............w..w.......',
-	'................................',
-	'................................',
-	'..........ww....................',
-	'.........w..w...................',
-	'................................',
-];
-const waveSvg = spriteSvg(WAVE_TILE, { w: '#ffffff' }).replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ');
-const waveTile = `url("data:image/svg+xml,${encodeURIComponent(waveSvg)}")`;
 const squids = [
 	{ left: 5, top: 8, delay: 0 },
 	{ left: 91, top: 22, delay: -1.7 },
@@ -61,7 +48,7 @@ const squids = [
 const GULL = [spriteSvg(['w.....w', '.w...w.', '..www..'], { w: '#f4ece0' }), spriteSvg(['.......', 'wwwwwww', '..www..'], { w: '#f4ece0' })];
 ---
 
-<div class="life" aria-hidden="true" style={`--wave-tile:${waveTile}`}>
+<div class="life" aria-hidden="true">
 	{ripples.map((r) => <span class="ripple" style={`left:${r.left}%;top:${r.top}%;width:${r.width}px;--delay:${r.delay}s`} />)}
 	{
 		squids.map((s) => (
@@ -105,7 +92,7 @@ const GULL = [spriteSvg(['w.....w', '.w...w.', '..www..'], { w: '#f4ece0' }), sp
 		content: '';
 		position: absolute;
 		inset: 0;
-		background: var(--wave-tile) 0 0 / 96px 24px repeat;
+		background: url('/pixel/harbor-waves.svg') 0 0 / 96px 24px repeat;
 		opacity: 0.12;
 		animation: waves 12s steps(32) infinite;
 	}

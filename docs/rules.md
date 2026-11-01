@@ -85,6 +85,7 @@
 
 - Tailwind は使いません。React も、必要になるまで入れません。
 - 共通の CSS は `src/styles/dusk.css`、部品だけのものは各 `.astro` の `<style>` に置きます。
+- 形が決まっているドット絵は HTML に直接書かず、otoneko.cat と同じく `/pixel/` の静的ファイルにします (`src/data/pixel-files.ts`)。HTML に直接書くのは、アニメーションでコマを切り替えるスプライトと、数か所にしか出ない小さなアイコンだけです。
 - 部品はセクションごとに分け、ページは部品を並べるだけにします。
 - Cloudflare は `devuloper` アカウントを使います。`mofumofupop` アカウントは使いません。
 - 正規のドメインは `montblank.fun` (www なし) です。`www.montblank.fun` は 301 で転送します。

@@ -3,11 +3,11 @@
  * A stone-paved path down the middle of the harbour, under the column of windows, paved like Hachiman-zaka:
  * irregular, many-sided grey flagstones with dark joints and one straight strip of stone down the centre,
  * with a granite kerb on each side where the water begins. It darkens toward the bottom along with the water.
+ * The flagstones are one repeating 96x64-dot tile, drawn in src/data/stone-path.ts and served as /pixel/stone-path.svg.
  */
-import { TILE_W, TILE_H, tile } from '@/data/stone-path';
 ---
 
-<div class="path" aria-hidden="true" style={`--tile:${tile};--tile-w:${TILE_W * 3}px;--tile-h:${TILE_H * 3}px`}>
+<div class="path" aria-hidden="true">
 	<span class="path__centre"></span>
 </div>
 
@@ -21,7 +21,7 @@ import { TILE_W, TILE_H, tile } from '@/data/stone-path';
 		translate: -50% 0;
 		background:
 			linear-gradient(transparent 0 25%, #2a1a3026 25% 50%, #2a1a3048 50% 75%, #1d142070 75% 100%),
-			var(--tile) 0 0 / var(--tile-w) var(--tile-h) repeat;
+			url('/pixel/stone-path.svg') 0 0 / calc(96 * var(--dot)) calc(64 * var(--dot)) repeat;
 		/* Granite kerbs, then the quay edge dropping to the water. */
 		border-inline: 12px solid #b8aca6;
 		box-shadow:

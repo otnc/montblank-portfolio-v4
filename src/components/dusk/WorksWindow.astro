@@ -5,7 +5,6 @@ import Window from '@/components/dusk/Window.astro';
 import Octocat from '@/components/Octocat.astro';
 import { profile } from '@/data/profile';
 import type { Work } from '@/lib/github';
-import { spriteSvg } from '@/lib/pixel-grid';
 
 interface Props {
 	works: Work[] | null | Promise<Work[] | null>;
@@ -13,7 +12,6 @@ interface Props {
 
 const works = await Astro.props.works;
 const repositoriesUrl = `https://github.com/${profile.handle}?tab=repositories`;
-const pin = spriteSvg(['..ppp..', '..ppp..', '..ppp..', '.ppppp.', '...p...', '...p...', '...p...'], { p: '#c8442f' });
 ---
 
 <Window title={`/${profile.handle}/works/`} class="window--right">
@@ -27,7 +25,7 @@ const pin = spriteSvg(['..ppp..', '..ppp..', '..ppp..', '.ppppp.', '...p...', '.
 							<h3>
 								{work.pinned && (
 									<span class="work__pin" title="Pinned">
-										<Fragment set:html={pin} />
+										<img src="/pixel/pushpin.svg" width="21" height="21" alt="" />
 										<span class="visually-hidden">Pinned</span>
 									</span>
 								)}
@@ -111,7 +109,7 @@ const pin = spriteSvg(['..ppp..', '..ppp..', '..ppp..', '.ppppp.', '...p...', '.
 		color: var(--ink);
 	}
 
-	.work__pin :global(svg) {
+	.work__pin img {
 		display: block;
 	}
 

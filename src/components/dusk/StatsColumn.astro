@@ -4,7 +4,6 @@
  * each with its own pixel icon. A count of none, or one that is unknown, shows as "-".
  */
 import { formatCompact, formatCount } from '@/lib/format';
-import { spriteSvg } from '@/lib/pixel-grid';
 
 interface Props {
 	stars: number | null;
@@ -14,20 +13,10 @@ interface Props {
 
 const { stars, merged, issues } = Astro.props;
 
-const icons = {
-	star: spriteSvg(['...s...', '...s...', 'sssssss', '.sssss.', '..sss..', '.ss.ss.', 's.....s'], { s: '#e8b23a' }),
-	// Two branches joining: the git-merge mark.
-	merge: spriteSvg(
-		['.o.......', 'ooo......', '.o.......', '.o...o...', '.ooooooo.', '.o...o...', '.o.......', 'ooo......', '.o.......'],
-		{ o: '#7a5ad0' },
-	),
-	issue: spriteSvg(['..ggg..', '.g...g.', 'g.....g', 'g..g..g', 'g.....g', '.g...g.', '..ggg..'], { g: '#4f9a5a' }),
-};
-
 const stats = [
-	{ icon: icons.star, value: stars, label: 'stars' },
-	{ icon: icons.merge, value: merged, label: 'merged pull requests' },
-	{ icon: icons.issue, value: issues, label: 'issues' },
+	{ icon: 'star', size: 21, value: stars, label: 'stars' },
+	{ icon: 'merge', size: 27, value: merged, label: 'merged pull requests' },
+	{ icon: 'issue', size: 21, value: issues, label: 'issues' },
 ];
 ---
 
@@ -36,7 +25,7 @@ const stats = [
 		stats.map((stat) => (
 			<div title={stat.value ? `${formatCount(stat.value)} ${stat.label}` : undefined}>
 				<dt>
-					<Fragment set:html={stat.icon} />
+					<img src={`/pixel/${stat.icon}.svg`} width={stat.size} height={stat.size} alt="" />
 					<span class="visually-hidden">{stat.label}</span>
 				</dt>
 				<dd>{stat.value ? formatCompact(stat.value) : '-'}</dd>
@@ -64,7 +53,7 @@ const stats = [
 		place-items: center;
 	}
 
-	.stats dt :global(svg) {
+	.stats dt img {
 		display: block;
 	}
 

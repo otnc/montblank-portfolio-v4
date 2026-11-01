@@ -1,6 +1,7 @@
 ---
 import Window from '@/components/dusk/Window.astro';
 import PixelIcon from '@/components/PixelIcon.astro';
+import { pixelIcons } from '@/data/pixel-icons';
 import { writingSites } from '@/data/profile';
 import type { Post } from '@/lib/feeds';
 import { formatDate } from '@/lib/format';
@@ -29,7 +30,9 @@ const isNew = (date: string) => {
 					return (
 						<li>
 							<a class="post" href={post.url} target="_blank" rel="noreferrer">
-								{site && <PixelIcon name={site.icon} scale={2} />}
+								{site && (
+									<img class="pixel-icon" src={`/pixel/icon-${site.icon}.svg`} width="32" height="32" alt={pixelIcons[site.icon].label} />
+								)}
 								<span class="post__body">
 									<span class="post__title">
 										{post.date && isNew(post.date) && <span class="post__new">New</span>}
