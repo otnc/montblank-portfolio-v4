@@ -85,9 +85,11 @@ const url = `${SITE_ORIGIN}${path}`;
 		</div>
 
 		<script>
+			import { setupBirthdayFireworks } from '@/scripts/birthday-fireworks';
 			import { pauseWhileOffscreen, setupReveal } from '@/scripts/reveal';
 
 			setupReveal();
+			setupBirthdayFireworks();
 			pauseWhileOffscreen('.hero, .page, .footer, .marquee');
 		</script>
 	</body>
