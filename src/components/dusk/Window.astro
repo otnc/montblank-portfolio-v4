@@ -4,12 +4,14 @@ interface Props {
 	class?: string;
 	/** Drops the body padding, e.g. for an image that should touch the frame. */
 	flush?: boolean;
+	/** Opens as soon as it is painted instead of when scrolled into view, for the first screen. */
+	open?: boolean;
 }
 
-const { title, class: className, flush = false } = Astro.props;
+const { title, class: className, flush = false, open = false } = Astro.props;
 ---
 
-<div class:list={['window-shell', className]} data-reveal>
+<div class:list={['window-shell', className, { 'is-visible': open }]} data-reveal={open ? undefined : ''}>
 	<span class="window-zoom" aria-hidden="true"></span>
 	<span class="window-zoom window-zoom--trail" aria-hidden="true"></span>
 	<section class="window">

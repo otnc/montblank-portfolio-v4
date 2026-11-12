@@ -1,4 +1,6 @@
 ---
+import marqueeScript from '@/scripts/inline/marquee.js?raw';
+
 interface Props {
 	messages: string[];
 }
@@ -21,12 +23,7 @@ const { messages } = Astro.props;
 	</div>
 </div>
 
-<script>
-	import { setupMarquee } from '@/scripts/marquee';
-
-	const track = document.querySelector<HTMLElement>('[data-marquee]');
-	if (track) setupMarquee(track, window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-</script>
+<script is:inline set:html={marqueeScript} />
 
 <style>
 	.marquee {
@@ -38,7 +35,7 @@ const { messages } = Astro.props;
 	}
 
 	/*
-	 * The track holds identical copies of one message group (added by scripts/marquee.ts to cover the viewport).
+	 * The track holds identical copies of one message group (added by scripts/inline/marquee.js to cover the viewport).
 	 * It slides by exactly one group width, so the last frame matches the first and the loop has no visible seam.
 	 */
 	.marquee__track {

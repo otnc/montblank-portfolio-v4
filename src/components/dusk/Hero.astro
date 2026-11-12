@@ -4,6 +4,7 @@ import BayView from '@/components/dusk/BayView.astro';
 import Window from '@/components/dusk/Window.astro';
 import PixelIcon from '@/components/PixelIcon.astro';
 import { accounts, profile } from '@/data/profile';
+import typewriterScript from '@/scripts/inline/typewriter.js?raw';
 
 // The sub organisation shares GitHub's icon, so the hero shows each service once.
 const heroAccounts = accounts.filter((account, index) => accounts.findIndex((other) => other.icon === account.icon) === index);
@@ -21,9 +22,9 @@ const heroAccounts = accounts.filter((account, index) => accounts.findIndex((oth
 	<DuskSky />
 	<BayView />
 	<div class="hero__inner">
-		<Window title="marron.png" class="avatar-window" flush>
+		<Window title="marron.png" class="avatar-window" flush open>
 			<div class="avatar" data-avatar data-src={profile.icon}>
-				<img src={profile.icon} alt="" width="220" height="220" />
+				<img src={profile.icon} alt="" width="220" height="220" fetchpriority="high" />
 			</div>
 		</Window>
 		<h1>{profile.name}</h1>
@@ -31,6 +32,7 @@ const heroAccounts = accounts.filter((account, index) => accounts.findIndex((oth
 			<span class="terminal__prompt" aria-hidden="true">&gt;</span>
 			<span data-typewriter>{profile.tagline}</span><span class="caret" aria-hidden="true">_</span>
 		</p>
+		<script is:inline set:html={typewriterScript} />
 		<ul class="hero__icons">
 			{
 				heroAccounts.map((account, index) => (
@@ -47,7 +49,6 @@ const heroAccounts = accounts.filter((account, index) => accounts.findIndex((oth
 
 <script>
 	import { mountDitheredAvatar } from '@/scripts/dusk-shaders';
-	import { typewrite } from '@/scripts/typewriter';
 
 	const avatar = document.querySelector<HTMLElement>('[data-avatar]');
 	if (avatar) {
@@ -57,9 +58,6 @@ const heroAccounts = accounts.filter((account, index) => accounts.findIndex((oth
 				// Keep the plain <img> fallback when WebGL or the image is unavailable.
 			});
 	}
-
-	const typewriter = document.querySelector<HTMLElement>('[data-typewriter]');
-	if (typewriter && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) typewrite(typewriter);
 </script>
 
 <style>

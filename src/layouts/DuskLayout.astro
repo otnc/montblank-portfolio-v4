@@ -10,6 +10,7 @@ import GasLamps from '@/components/dusk/GasLamps.astro';
 import HarborLife from '@/components/dusk/HarborLife.astro';
 import StonePath from '@/components/dusk/StonePath.astro';
 import { SITE_ORIGIN, profile } from '@/data/profile';
+import revealScript from '@/scripts/inline/reveal.js?raw';
 
 interface Props {
 	title: string;
@@ -55,6 +56,7 @@ const url = `${SITE_ORIGIN}${path}`;
 		<link rel="preload" href="/fonts/pixelmplus/10-site.woff2" as="font" type="font/woff2" crossorigin />
 	</head>
 	<body>
+		<script is:inline set:html={revealScript} />
 		<a class="skip-link" href="#main">本文へ</a>
 
 		<div class="site">
@@ -86,9 +88,8 @@ const url = `${SITE_ORIGIN}${path}`;
 
 		<script>
 			import { setupBirthdayFireworks } from '@/scripts/birthday-fireworks';
-			import { pauseWhileOffscreen, setupReveal } from '@/scripts/reveal';
+			import { pauseWhileOffscreen } from '@/scripts/offscreen';
 
-			setupReveal();
 			setupBirthdayFireworks();
 			pauseWhileOffscreen('.hero, .page, .footer, .marquee');
 		</script>
