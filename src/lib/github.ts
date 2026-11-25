@@ -108,37 +108,71 @@ function languageShares(languages: LanguageEdges | undefined) {
 
 // ---- Stats ----
 
-interface StatsPage {
+interface ProfilePage {
 	user: {
 		createdAt: string;
 		followers: { totalCount: number };
 		contributionsCollection: {
 			contributionCalendar: { weeks: { contributionDays: { date: string; contributionCount: number }[] }[] };
 		};
-		repositories: {
-			totalCount: number;
-			pageInfo: { hasNextPage: boolean; endCursor: string | null };
-			nodes: { stargazerCount: number; languages: LanguageEdges }[];
-		};
 	};
 }
 
-const STATS_QUERY = `
-	query ($login: String!, $after: String, $from: DateTime!, $to: DateTime!) {
+const PROFILE_QUERY = `
+	query ($login: String!, $from: DateTime!, $to: DateTime!) {
 		user(login: $login) {
 			createdAt
 			followers { totalCount }
 			contributionsCollection(from: $from, to: $to) {
 				contributionCalendar { weeks { contributionDays { date contributionCount } } }
 			}
-			repositories(first: 100, after: $after, ownerAffiliations: OWNER, isFork: false, privacy: PUBLIC) {
+		}
+	}
+`;
+
+type OwnRepository = { id: string; stargazerCount: number; languages: LanguageEdges };
+
+interface RepositoriesPage {
+	user: {
+		repositories: {
+			totalCount: number;
+			pageInfo: { hasNextPage: boolean; endCursor: string | null };
+			nodes: OwnRepository[];
+		};
+	};
+}
+
+const REPOSITORIES_QUERY = `
+	query ($login: String!, $after: String, $direction: OrderDirection!) {
+		user(login: $login) {
+			repositories(first: 100, after: $after, ownerAffiliations: OWNER, isFork: false, privacy: PUBLIC, orderBy: { field: CREATED_AT, direction: $direction }) {
 				totalCount
 				pageInfo { hasNextPage endCursor }
-				nodes { stargazerCount ${LANGUAGES_FIELD} }
+				nodes { id stargazerCount ${LANGUAGES_FIELD} }
 			}
 		}
 	}
 `;
+
+/**
+ * Every public non-fork repository the user owns.
+ * The oldest and newest 100 are requested together, which covers up to 200 repositories in the time of one request
+ * (each page takes seconds because of the languages); beyond that the oldest end is paged on.
+ */
+async function fetchOwnRepositories(token: string, login: string) {
+	const page = (direction: 'ASC' | 'DESC', after: string | null) =>
+		graphql<RepositoriesPage>(token, REPOSITORIES_QUERY, { login, after, direction }).then((data) => data.user.repositories);
+	const [oldest, newest] = await Promise.all([page('ASC', null), page('DESC', null)]);
+	const byId = new Map<string, OwnRepository>();
+	for (const repository of [...oldest.nodes, ...newest.nodes]) byId.set(repository.id, repository);
+	let next = oldest.pageInfo;
+	while (byId.size < oldest.totalCount && next.hasNextPage) {
+		const more = await page('ASC', next.endCursor);
+		for (const repository of more.nodes) byId.set(repository.id, repository);
+		next = more.pageInfo;
+	}
+	return [...byId.values()];
+}
 
 const RECENT_DAYS = 31;
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -165,35 +199,24 @@ async function fetchAllTimeContributions(token: string, login: string, createdAt
 async function fetchStats(token: string, login: string): Promise<GithubStats> {
 	const to = new Date();
 	const from = new Date(to.getTime() - (RECENT_DAYS - 1) * DAY_MS);
-	const sizes = new Map<string, { size: number; color: string }>();
-	let totalStars = 0;
-	let after: string | null = null;
-	let first: StatsPage['user'] | undefined;
+	const profile = graphql<ProfilePage>(token, PROFILE_QUERY, { login, from: from.toISOString(), to: to.toISOString() }).then(
+		async ({ user }) => {
+			if (!user) throw new Error(`GitHub user ${login} not found`);
+			return { user, totalContributions: await fetchAllTimeContributions(token, login, user.createdAt) };
+		},
+	);
+	const [{ user, totalContributions }, repositories] = await Promise.all([profile, fetchOwnRepositories(token, login)]);
 
-	do {
-		const page: StatsPage = await graphql<StatsPage>(token, STATS_QUERY, {
-			login,
-			after,
-			from: from.toISOString(),
-			to: to.toISOString(),
-		});
-		first ??= page.user;
-		for (const repository of page.user.repositories.nodes) {
-			totalStars += repository.stargazerCount;
-			addLanguages(sizes, repository.languages);
-		}
-		const { hasNextPage, endCursor } = page.user.repositories.pageInfo;
-		after = hasNextPage ? endCursor : null;
-	} while (after);
-	if (!first) throw new Error(`GitHub user ${login} not found`);
+	const sizes = new Map<string, { size: number; color: string }>();
+	for (const repository of repositories) addLanguages(sizes, repository.languages);
 
 	return {
-		totalContributions: await fetchAllTimeContributions(token, login, first.createdAt),
-		followers: first.followers.totalCount,
-		publicRepos: first.repositories.totalCount,
-		totalStars,
+		totalContributions,
+		followers: user.followers.totalCount,
+		publicRepos: repositories.length,
+		totalStars: repositories.reduce((sum, repository) => sum + repository.stargazerCount, 0),
 		languages: toShares(sizes),
-		recentDays: first.contributionsCollection.contributionCalendar.weeks
+		recentDays: user.contributionsCollection.contributionCalendar.weeks
 			.flatMap((week) => week.contributionDays)
 			.slice(-RECENT_DAYS)
 			.map((day) => ({ date: day.date, count: day.contributionCount })),
@@ -276,9 +299,12 @@ interface SearchPage {
 	};
 }
 
+const SEARCH_PAGE_SIZE = 100;
+const SEARCH_RESULT_LIMIT = 1000;
+
 const CONTRIBUTIONS_QUERY = `
 	query ($query: String!, $after: String) {
-		search(query: $query, type: ISSUE, first: 100, after: $after) {
+		search(query: $query, type: ISSUE, first: ${SEARCH_PAGE_SIZE}, after: $after) {
 			pageInfo { hasNextPage endCursor }
 			nodes {
 				... on PullRequest { repository { name url owner { login } stargazerCount ${LANGUAGES_FIELD} } }
@@ -288,16 +314,40 @@ const CONTRIBUTIONS_QUERY = `
 	}
 `;
 
-/** Every result of a search, up to the 1,000 GitHub returns, as the repositories they belong to. */
+const SEARCH_COUNT_QUERY = 'query ($query: String!) { search(query: $query, type: ISSUE, first: 0) { issueCount } }';
+
+const offsetCursor = (offset: number) => btoa(`cursor:${offset}`);
+
+/**
+ * Every result of a search, up to the 1,000 GitHub returns, as the repositories they belong to.
+ * Search cursors are currently base64 of `cursor:<offset>`, so after a quick count every page is requested at once
+ * instead of one after another (each page takes one to four seconds).
+ * If the first page shows GitHub has changed the format, the pages are followed one by one instead.
+ */
 async function searchRepositories(token: string, query: string) {
-	const repositories: SearchRepository[] = [];
-	let after: string | null = null;
-	do {
-		const page: SearchPage = await graphql<SearchPage>(token, CONTRIBUTIONS_QUERY, { query, after });
-		for (const { repository } of page.search.nodes) if (repository) repositories.push(repository);
-		after = page.search.pageInfo.hasNextPage ? page.search.pageInfo.endCursor : null;
-	} while (after);
-	return repositories;
+	const page = (after: string | null) => graphql<SearchPage>(token, CONTRIBUTIONS_QUERY, { query, after }).then((data) => data.search);
+	const count = await graphql<{ search: { issueCount: number } }>(token, SEARCH_COUNT_QUERY, { query });
+	const last = Math.min(count.search.issueCount, SEARCH_RESULT_LIMIT);
+	const offsets: number[] = [];
+	for (let offset = SEARCH_PAGE_SIZE; offset < last; offset += SEARCH_PAGE_SIZE) offsets.push(offset);
+	// Settled rather than all: with a changed cursor format these requests may fail, and are then not needed.
+	const [first, rest] = await Promise.all([page(null), Promise.allSettled(offsets.map((offset) => page(offsetCursor(offset))))]);
+
+	const pages = [first];
+	if (!first.pageInfo.hasNextPage || first.pageInfo.endCursor === offsetCursor(SEARCH_PAGE_SIZE)) {
+		for (const result of rest) {
+			if (result.status === 'rejected') throw result.reason;
+			pages.push(result.value);
+		}
+	} else {
+		let next = first.pageInfo;
+		while (next.hasNextPage) {
+			const more = await page(next.endCursor);
+			pages.push(more);
+			next = more.pageInfo;
+		}
+	}
+	return pages.flatMap((result) => result.nodes.flatMap(({ repository }) => (repository ? [repository] : [])));
 }
 
 /**
