@@ -21,7 +21,8 @@ export async function cached<T>(key: string, seconds: number, load: () => Promis
 	if (remembered && remembered.expires > now) return remembered.value as T;
 
 	const cache = edgeCache();
-	const request = new Request(`https://cache.montblank.fun/${encodeURIComponent(key)}`);
+	// Only a key for the Cache API, never fetched; nothing is served under /_cache/.
+	const request = new Request(new URL(`/_cache/${encodeURIComponent(key)}`, import.meta.env.SITE));
 	const hit = await cache?.match(request).catch(() => undefined);
 	if (hit) return hit.json() as Promise<T>;
 
