@@ -1,0 +1,36 @@
+---
+interface Props {
+	/** About the height of the content it stands in for, so the page does not jump when that arrives. */
+	height: string;
+}
+
+const { height } = Astro.props;
+---
+
+<p class="loading notice" style={`min-height:${height}`} role="status">
+	読み込み中<span class="loading__dots" aria-hidden="true">...</span>
+</p>
+
+<style>
+	/* The dots appear one at a time: each PixelMplus10 dot is 10px wide at 20px. */
+	.loading__dots {
+		display: inline-block;
+		width: 0;
+		overflow: hidden;
+		vertical-align: bottom;
+		animation: loading-dots 1.2s steps(4, jump-none) infinite;
+	}
+
+	@keyframes loading-dots {
+		to {
+			width: 30px;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.loading__dots {
+			width: auto;
+			animation: none;
+		}
+	}
+</style>

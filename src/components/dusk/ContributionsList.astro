@@ -1,0 +1,33 @@
+---
+import LanguageBar from '@/components/dusk/LanguageBar.astro';
+import StatsColumn from '@/components/dusk/StatsColumn.astro';
+import { profile } from '@/data/profile';
+import { orNull } from '@/lib/cache';
+import { getContributions } from '@/lib/github';
+
+const contributions = await orNull(getContributions(Astro.locals.runtime?.env?.GITHUB_TOKEN, profile.handle));
+// Styled in ContributionsWindow.astro: a server island is rendered on its own, so its own <style> would never reach the static page.
+---
+
+{
+	contributions && contributions.length > 0 ? (
+		<ul class="repos">
+			{contributions.map((repo) => (
+				<li class="repo">
+					<div class="repo__text">
+						<a class="repo__name" href={repo.url} target="_blank" rel="noreferrer">
+							<span class="muted">{repo.owner}/</span>
+							{repo.name}
+						</a>
+						<LanguageBar languages={repo.languages.slice(0, 3)} />
+					</div>
+					<StatsColumn stars={repo.stars} merged={repo.mergedCount} issues={repo.issueCount} />
+				</li>
+			))}
+		</ul>
+	) : contributions ? (
+		<p class="notice">まだありません。</p>
+	) : (
+		<p class="notice">GitHub から読み込めませんでした。</p>
+	)
+}

@@ -18,6 +18,7 @@ const stats = [
 	{ icon: 'merge', size: 27, value: merged, label: 'merged pull requests' },
 	{ icon: 'issue', size: 21, value: issues, label: 'issues' },
 ];
+// Styled in src/styles/dusk.css: this only appears inside server islands, whose own styles never reach the static page.
 ---
 
 <dl class="stats">
@@ -33,32 +34,3 @@ const stats = [
 		))
 	}
 </dl>
-
-<style>
-	.stats {
-		display: grid;
-		flex: none;
-		margin: 0;
-	}
-
-	.stats div {
-		display: grid;
-		grid-template-columns: 27px 60px;
-		align-items: center;
-		gap: 6px;
-	}
-
-	.stats dt {
-		display: grid;
-		place-items: center;
-	}
-
-	.stats dt img {
-		display: block;
-	}
-
-	.stats dd {
-		margin: 0;
-		text-align: right;
-	}
-</style>

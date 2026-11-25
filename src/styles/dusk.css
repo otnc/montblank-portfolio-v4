@@ -294,3 +294,61 @@ a:visited {
 		margin: 0;
 	}
 }
+
+/* LanguageBar and StatsColumn; they only appear inside server islands, whose own styles never reach the static page. */
+.languages__bar {
+	display: flex;
+	height: 9px;
+	outline: 3px solid var(--ink);
+}
+
+.languages__bar span {
+	flex-basis: 0;
+	min-width: 3px;
+}
+
+.languages__list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0 16px;
+	margin-top: 6px;
+}
+
+.languages__list li {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.languages__dot {
+	width: 9px;
+	height: 9px;
+	outline: 2px solid var(--ink);
+}
+
+.stats {
+	display: grid;
+	flex: none;
+	margin: 0;
+}
+
+.stats div {
+	display: grid;
+	grid-template-columns: 27px 60px;
+	align-items: center;
+	gap: 6px;
+}
+
+.stats dt {
+	display: grid;
+	place-items: center;
+}
+
+.stats dt img {
+	display: block;
+}
+
+.stats dd {
+	margin: 0;
+	text-align: right;
+}

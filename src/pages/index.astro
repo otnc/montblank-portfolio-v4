@@ -11,18 +11,9 @@ import TramStop from '@/components/dusk/TramStop.astro';
 import WorksWindow from '@/components/dusk/WorksWindow.astro';
 import DuskLayout from '@/layouts/DuskLayout.astro';
 import { profile } from '@/data/profile';
-import { orNull } from '@/lib/cache';
-import { getPosts } from '@/lib/feeds';
-import { getContributions, getGithubStats, getWorks } from '@/lib/github';
 
-// Optional Pages secret: with it GitHub is read through GraphQL, without it through the token-less sources (see src/lib/github-public.ts).
-const githubToken = Astro.locals.runtime?.env?.GITHUB_TOKEN;
-
-// Start every source together; each window awaits its data so the hero can stream immediately.
-const stats = orNull(getGithubStats(githubToken, profile.handle));
-const works = orNull(getWorks(githubToken, profile.handle));
-const contributions = orNull(getContributions(githubToken, profile.handle));
-const posts = orNull(getPosts());
+// Served as static HTML; the windows fetch GitHub and the feeds through server islands once the page is open.
+export const prerender = true;
 ---
 
 <DuskLayout path="/" title={`${profile.name}のポートフォリオ`} description={profile.bio}>
@@ -31,10 +22,10 @@ const posts = orNull(getPosts());
 
 	<main id="main" class="page">
 		<AboutWindow />
-		<BlogWindow posts={posts} />
-		<GithubWindow stats={stats} />
-		<WorksWindow works={works} />
-		<ContributionsWindow contributions={contributions} />
+		<BlogWindow />
+		<GithubWindow />
+		<WorksWindow />
+		<ContributionsWindow />
 		<CareerWindow />
 		<CrossLinksWindow />
 		<TramStop />

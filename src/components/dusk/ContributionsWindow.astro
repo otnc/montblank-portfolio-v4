@@ -1,44 +1,19 @@
 ---
-import LanguageBar from '@/components/dusk/LanguageBar.astro';
-import StatsColumn from '@/components/dusk/StatsColumn.astro';
+import ContributionsList from '@/components/dusk/ContributionsList.astro';
+import Loading from '@/components/dusk/Loading.astro';
 import Window from '@/components/dusk/Window.astro';
-import type { Contribution } from '@/lib/github';
-
-interface Props {
-	contributions: Contribution[] | null | Promise<Contribution[] | null>;
-}
-
-const contributions = await Astro.props.contributions;
 ---
 
 <Window title="contributions.txt" class="window--left">
 	<h2>Contributions</h2>
 	<p class="muted">他のリポジトリにマージされたプルリクエストと Issue</p>
-	{
-		contributions && contributions.length > 0 ? (
-			<ul class="repos">
-				{contributions.map((repo) => (
-					<li class="repo">
-						<div class="repo__text">
-							<a class="repo__name" href={repo.url} target="_blank" rel="noreferrer">
-								<span class="muted">{repo.owner}/</span>
-								{repo.name}
-							</a>
-							<LanguageBar languages={repo.languages.slice(0, 3)} />
-						</div>
-						<StatsColumn stars={repo.stars} merged={repo.mergedCount} issues={repo.issueCount} />
-					</li>
-				))}
-			</ul>
-		) : contributions ? (
-			<p class="notice">まだありません。</p>
-		) : (
-			<p class="notice">GitHub から読み込めませんでした。</p>
-		)
-	}
+	<ContributionsList server:defer>
+		<Loading slot="fallback" height="660px" />
+	</ContributionsList>
 </Window>
 
-<style>
+<style is:global>
+	/* The list, rendered by the ContributionsList server island. */
 	/*
 	 * A scrolling list, one repository per row, with its counts in a column on the right.
 	 * It is the positioning context for anything absolute inside, so that scrolls with the list instead of stretching the page.

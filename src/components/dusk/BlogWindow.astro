@@ -1,57 +1,16 @@
 ---
+import BlogPosts from '@/components/dusk/BlogPosts.astro';
+import Loading from '@/components/dusk/Loading.astro';
 import Window from '@/components/dusk/Window.astro';
 import PixelIcon from '@/components/PixelIcon.astro';
-import { pixelIcons } from '@/data/pixel-icons';
 import { writingSites } from '@/data/profile';
-import type { Post } from '@/lib/feeds';
-import { formatDate } from '@/lib/format';
-
-interface Props {
-	posts: Post[] | null | Promise<Post[] | null>;
-}
-
-const posts = await Astro.props.posts;
-const siteBySource = new Map(writingSites.map((site) => [site.label, site]));
-// As in portfolio-v3, posts from the last week get a "New" label.
-const NEW_WITHIN_MS = 7 * 24 * 60 * 60 * 1000;
-const isNew = (date: string) => {
-	const age = Date.now() - Date.parse(date);
-	return age >= 0 && age <= NEW_WITHIN_MS;
-};
 ---
 
 <Window title="feeds/" class="window--right">
 	<h2>Blog</h2>
-	{
-		posts && posts.length > 0 ? (
-			<ul class="posts">
-				{posts.map((post) => {
-					const site = siteBySource.get(post.source);
-					return (
-						<li>
-							<a class="post" href={post.url} target="_blank" rel="noreferrer">
-								{site && (
-									<img class="pixel-icon" src={`/pixel/icon-${site.icon}.svg`} width="32" height="32" alt={pixelIcons[site.icon].label} />
-								)}
-								<span class="post__body">
-									<span class="post__title">
-										{post.date && isNew(post.date) && <span class="post__new">New</span>}
-										{post.title}
-									</span>
-									{post.description && <span class="post__desc muted">{post.description}</span>}
-									<span class="post__meta muted">
-										{post.source} {formatDate(post.date)}
-									</span>
-								</span>
-							</a>
-						</li>
-					);
-				})}
-			</ul>
-		) : (
-			<p class="notice">記事を読み込めませんでした。</p>
-		)
-	}
+	<BlogPosts server:defer>
+		<Loading slot="fallback" height="600px" />
+	</BlogPosts>
 	<ul class="more">
 		{
 			writingSites.map((site) => (
@@ -67,6 +26,30 @@ const isNew = (date: string) => {
 </Window>
 
 <style>
+	/* Where each feed comes from, as icon links. */
+	.more {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px 24px;
+		margin-top: 16px;
+	}
+
+	.more a {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		color: var(--ink);
+		transition: transform 0.12s steps(2);
+	}
+
+	.more a:hover,
+	.more a:focus-visible {
+		transform: translateY(-3px);
+	}
+</style>
+
+<style is:global>
+	/* The post list, rendered by the BlogPosts server island. */
 	/* The positioning context for anything absolute inside, so it scrolls with the list instead of stretching the page. */
 	.posts {
 		position: relative;
@@ -90,7 +73,7 @@ const isNew = (date: string) => {
 		background: var(--marron-light);
 	}
 
-	.post :global(.pixel-icon) {
+	.post .pixel-icon {
 		flex: none;
 		margin-top: 3px;
 	}
@@ -135,26 +118,5 @@ const isNew = (date: string) => {
 		line-clamp: 2;
 		overflow: hidden;
 		overflow-wrap: anywhere;
-	}
-
-	/* Where each feed comes from, as icon links. */
-	.more {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 8px 24px;
-		margin-top: 16px;
-	}
-
-	.more a {
-		display: inline-flex;
-		align-items: center;
-		gap: 8px;
-		color: var(--ink);
-		transition: transform 0.12s steps(2);
-	}
-
-	.more a:hover,
-	.more a:focus-visible {
-		transform: translateY(-3px);
 	}
 </style>

@@ -9,6 +9,7 @@ interface Props {
 
 const { languages, labelled = 3 } = Astro.props;
 const percent = (value: number) => (value >= 10 ? value.toFixed(0) : value.toFixed(1));
+// Styled in src/styles/dusk.css: this only appears inside server islands, whose own styles never reach the static page.
 ---
 
 {
@@ -31,35 +32,3 @@ const percent = (value: number) => (value >= 10 ? value.toFixed(0) : value.toFix
 		</div>
 	)
 }
-
-<style>
-	.languages__bar {
-		display: flex;
-		height: 9px;
-		outline: 3px solid var(--ink);
-	}
-
-	.languages__bar span {
-		flex-basis: 0;
-		min-width: 3px;
-	}
-
-	.languages__list {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0 16px;
-		margin-top: 6px;
-	}
-
-	.languages__list li {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-	}
-
-	.languages__dot {
-		width: 9px;
-		height: 9px;
-		outline: 2px solid var(--ink);
-	}
-</style>

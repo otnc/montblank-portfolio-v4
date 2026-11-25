@@ -1,6 +1,6 @@
 // @ts-check
-// Inline classic script at the top of <body>: module scripts wait for the whole streamed page (every data fetch),
-// so the windows that arrive first would stay hidden. This watches elements as the parser adds them instead.
+// Inline classic script at the top of <body>: module scripts only run once the whole page is parsed,
+// so the windows parsed first would stay hidden until then. This watches elements as the parser adds them instead.
 (() => {
 	const selector = '[data-reveal], [data-light]';
 	const reveal = new IntersectionObserver(

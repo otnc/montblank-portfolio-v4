@@ -1,12 +1,12 @@
 # コードの構成
 
-Astro 7 を SSR (`output: 'server'`) で動かし、Cloudflare Pages に置いています。adapter は [astro-adapter-cloudflare-pages](https://www.npmjs.com/package/astro-adapter-cloudflare-pages) です。構成は otoneko.cat ([otnc-portfolio-v3](https://github.com/otnc/otnc-portfolio-v3)) に合わせています。
+Astro 7 を `output: 'server'` で動かし、Cloudflare Pages に置いています。トップページはビルド時に静的な HTML にし (`prerender`)、GitHub と記事のデータの部分だけを server islands でリクエスト時に描きます。adapter は [astro-adapter-cloudflare-pages](https://www.npmjs.com/package/astro-adapter-cloudflare-pages) です。構成は otoneko.cat ([otnc-portfolio-v3](https://github.com/otnc/otnc-portfolio-v3)) に合わせています。
 
 ## ディレクトリ
 
 ```text
 src/
-├── pages/index.astro            データを取得し、部品を並べるだけ
+├── pages/index.astro            部品を並べるだけ。ビルド時に静的な HTML になる
 ├── pages/404.astro              見つからないページ
 ├── pages/pixel/[name].svg.ts    ドット絵の SVG をビルド時に dist/pixel/ へ書き出す
 ├── layouts/DuskLayout.astro     <head>、港の水面と石畳、フッター、共通スクリプト
@@ -20,10 +20,15 @@ src/
 │   │   ├── StonePath.astro          ウィンドウの下の石畳 (八幡坂の舗装)
 │   │   ├── GasLamps.astro           石畳の道の両端のガス灯
 │   │   ├── AboutWindow.astro        自己紹介、キャッチコピー、趣味・所属など、SNS
-│   │   ├── BlogWindow.astro         記事 (ブログ、Zenn、Qiita、note) と各サイトへのリンク
-│   │   ├── GithubWindow.astro       GitHub の統計、全言語の割合、直近31日のグラフ
-│   │   ├── WorksWindow.astro        作品 (GitHub の pinned)
-│   │   ├── ContributionsWindow.astro  他のリポジトリにマージされた PR
+│   │   ├── BlogWindow.astro         記事のウィンドウの枠と各サイトへのリンク
+│   │   ├── BlogPosts.astro          記事 (ブログ、Zenn、Qiita、note) の一覧 (server island)
+│   │   ├── GithubWindow.astro       GitHub のウィンドウの枠
+│   │   ├── GithubSummary.astro      GitHub の統計、全言語の割合、直近31日のグラフ (server island)
+│   │   ├── WorksWindow.astro        作品のウィンドウの枠
+│   │   ├── WorksList.astro          作品 (GitHub の pinned) の一覧 (server island)
+│   │   ├── ContributionsWindow.astro  コントリビューションのウィンドウの枠
+│   │   ├── ContributionsList.astro  他のリポジトリにマージされた PR の一覧 (server island)
+│   │   ├── Loading.astro            server island が届くまでの「読み込み中」
 │   │   ├── CareerWindow.astro       経歴
 │   │   ├── CrossLinksWindow.astro   相互リンク、申請、このサイトのバナー
 │   │   ├── TramStop.astro           岸壁と市電の通り。市電が otoneko.cat への隠しリンク
@@ -52,7 +57,7 @@ src/
 │   ├── pixel-path.ts            小さなドット絵をパスにまとめる
 │   └── format.ts                数と日付の表記
 ├── styles/
-│   ├── dusk.css                 色のトークン、文字、ボタン、ページの列、凸凹の線
+│   ├── dusk.css                 色のトークン、文字、ボタン、ページの列、凸凹の線、言語のバーと数の列
 │   └── pixelmplus.css           フォントの @font-face (生成物、git 管理外)
 ├── worker.ts                    Pages の入口。www を montblank.fun に転送
 └── env.d.ts                     Pages の環境変数の型
@@ -77,9 +82,15 @@ scripts/build-images.mjs         OGP 画像、相互リンク用バナー、favi
 
 ## データの取得
 
-`src/pages/index.astro` がリクエストのたびに4つの取得を並行して始め、各ウィンドウに Promise を渡します。ウィンドウ側で結果を待つので、取得が終わる前に HTML の先頭とヒーローを送れます。完成したページの内容とセクションの順序は変わりません。ブラウザのモジュールスクリプトは、HTML を最後まで (すべての取得が終わるまで) 読み込んでから実行されます。そのため、最初の画面に関わるもの (スクロールで窓を開く処理、流れるメッセージ、タイプライター) はモジュールにせず、`src/scripts/inline/` の JavaScript を `?raw` で読み込んで `<script is:inline>` として HTML に直接書き、取得を待たずに動かします。ヒーローのアイコンの窓は `Window` の `open` で、スクロールを待たずに最初から開きます。
+トップページ (`src/pages/index.astro`) は `prerender` でビルド時に静的な HTML にし、Pages が Worker を動かさずに返します。外部 API の応答を待たないので、ページ全体がすぐ届きます。アプリ内ブラウザ (Twitter など) が、読み込みの終わらないページを表示できないことがあったためです。
 
-結果は `src/lib/cache.ts` が Cloudflare のキャッシュ (Cache API) に1時間置くので、外部 API を呼ぶのはデータセンターごとに1時間1回です。キャッシュのキーは `https://montblank.fun/_cache/...` の形の URL ですが、キーとして使うだけで、そのパスには何も置いていません。Cache API は `*.pages.dev` では効かないので、そこでは毎回取得します。
+GitHub と記事のデータを表示する部分だけは server islands (`server:defer`) にしています。ウィンドウの枠と見出しは静的な HTML に入れ、中身の一覧 (`BlogPosts`、`GithubSummary`、`WorksList`、`ContributionsList`) は、ページを開いた直後に Astro のスクリプトが `/_server-islands/*` へ取りに行きます。各 island の Worker がデータを取得して HTML を返し、届くまでは `Loading` の「読み込み中」を出します。4つの island は別々のリクエストなので、届いたものから表示されます。
+
+server island の部品に `<style>` を書いても、その CSS はページにも island の応答にも入りません。island の中身のスタイルは、静的な枠の部品 (`BlogWindow` など) の `<style is:global>` に書きます。island の中でしか描かない `LanguageBar` と `StatsColumn` のスタイルは、3つのウィンドウで共通なので `src/styles/dusk.css` に置いています。
+
+最初の画面に関わるスクリプト (スクロールで窓を開く処理、流れるメッセージ、タイプライター) は、`src/scripts/inline/` の JavaScript を `?raw` で読み込んで `<script is:inline>` として HTML に直接書いています。ヒーローのアイコンの窓は `Window` の `open` で、スクロールを待たずに最初から開きます。
+
+取得結果は `src/lib/cache.ts` が Cloudflare のキャッシュ (Cache API) に1時間置くので、外部 API を呼ぶのはデータセンターごとに1時間1回です。キャッシュのキーは `https://montblank.fun/_cache/...` の形の URL ですが、キーとして使うだけで、そのパスには何も置いていません。Cache API は `*.pages.dev` では効かないので、そこでは毎回取得します。
 
 取得に失敗したセクションは、ページ全体を落とさずにそのセクションだけ案内を出します (`orNull`)。記事は、取れたサイトの分だけ出します。
 

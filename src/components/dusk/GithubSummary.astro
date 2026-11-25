@@ -1,0 +1,61 @@
+---
+import LanguageBar from '@/components/dusk/LanguageBar.astro';
+import { profile } from '@/data/profile';
+import { orNull } from '@/lib/cache';
+import { formatCount } from '@/lib/format';
+import { getGithubStats } from '@/lib/github';
+
+const stats = await orNull(getGithubStats(Astro.locals.runtime?.env?.GITHUB_TOKEN, profile.handle));
+const profileUrl = `https://github.com/${profile.handle}`;
+const peak = stats ? Math.max(1, ...stats.recentDays.map((day) => day.count)) : 1;
+// Bars snap to whole 3px dots, from 0 to GRAPH_DOTS dots tall.
+const GRAPH_DOTS = 24;
+// Styled in GithubWindow.astro: a server island is rendered on its own, so its own <style> would never reach the static page.
+---
+
+{
+	stats ? (
+		<>
+			<dl class="numbers">
+				<div>
+					<dt>Total Contributions</dt>
+					<dd>{formatCount(stats.totalContributions)}</dd>
+				</div>
+				<div>
+					<dt>Followers</dt>
+					<dd>{formatCount(stats.followers)}</dd>
+				</div>
+				<div>
+					<dt>Public Repos</dt>
+					<dd>{formatCount(stats.publicRepos)}</dd>
+				</div>
+				<div>
+					<dt>Total Stars</dt>
+					<dd>{formatCount(stats.totalStars)}</dd>
+				</div>
+			</dl>
+
+			<h3>言語</h3>
+			<LanguageBar languages={stats.languages} labelled={stats.languages.length} />
+
+			<h3 class="graph-heading">直近31日間のコミット数</h3>
+			<ol class="graph" style={`--graph-dots:${GRAPH_DOTS}`}>
+				{stats.recentDays.map((day) => (
+					<li title={`${day.date}: ${day.count}`} style={`--dots:${Math.ceil((day.count / peak) * GRAPH_DOTS)}`}>
+						<span class="visually-hidden">
+							{day.date}: {day.count}
+						</span>
+					</li>
+				))}
+			</ol>
+		</>
+	) : (
+		<p class="notice">
+			GitHub の情報を読み込めませんでした。
+			<a href={profileUrl} target="_blank" rel="noreferrer">
+				GitHub
+			</a>
+			で見てください。
+		</p>
+	)
+}

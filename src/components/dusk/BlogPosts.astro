@@ -1,0 +1,48 @@
+---
+import { pixelIcons } from '@/data/pixel-icons';
+import { writingSites } from '@/data/profile';
+import { orNull } from '@/lib/cache';
+import { getPosts } from '@/lib/feeds';
+import { formatDate } from '@/lib/format';
+
+const posts = await orNull(getPosts());
+const siteBySource = new Map(writingSites.map((site) => [site.label, site]));
+// As in portfolio-v3, posts from the last week get a "New" label.
+const NEW_WITHIN_MS = 7 * 24 * 60 * 60 * 1000;
+const isNew = (date: string) => {
+	const age = Date.now() - Date.parse(date);
+	return age >= 0 && age <= NEW_WITHIN_MS;
+};
+// Styled in BlogWindow.astro: a server island is rendered on its own, so its own <style> would never reach the static page.
+---
+
+{
+	posts && posts.length > 0 ? (
+		<ul class="posts">
+			{posts.map((post) => {
+				const site = siteBySource.get(post.source);
+				return (
+					<li>
+						<a class="post" href={post.url} target="_blank" rel="noreferrer">
+							{site && (
+								<img class="pixel-icon" src={`/pixel/icon-${site.icon}.svg`} width="32" height="32" alt={pixelIcons[site.icon].label} />
+							)}
+							<span class="post__body">
+								<span class="post__title">
+									{post.date && isNew(post.date) && <span class="post__new">New</span>}
+									{post.title}
+								</span>
+								{post.description && <span class="post__desc muted">{post.description}</span>}
+								<span class="post__meta muted">
+									{post.source} {formatDate(post.date)}
+								</span>
+							</span>
+						</a>
+					</li>
+				);
+			})}
+		</ul>
+	) : (
+		<p class="notice">記事を読み込めませんでした。</p>
+	)
+}

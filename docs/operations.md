@@ -107,7 +107,7 @@ npx wrangler pages secret delete GITHUB_TOKEN --project-name montblank-portfolio
 
 `npm test` で、SVG を小さくしても色、透過、1ドットの大きさが変わらないことを確認します。`npm run build` で本番用の Worker と静的ファイルを生成します。
 
-初回表示を計測するときは、キャッシュがあるときとないときを分けます。HTML の先頭が届くまでの時間と、外部データを含む HTML 全体の読み込み時間も分けて確認します。ストリーミングで前者を短くしても、外部 API 自体の応答時間は変わりません。
+初回表示を計測するときは、キャッシュがあるときとないときを分けます。トップページの HTML は静的なので外部 API に左右されません。外部データの時間は、`/_server-islands/*` の4つのリクエストの応答時間で確認します。`/_server-islands/*` の URL は、ビルドした `dist/index.html` に書かれています。
 
 ## ライセンス
 
