@@ -20,17 +20,17 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@paper-design/shaders": "^0.0.81",
-    "astro": "^7.4.1",
-    "astro-adapter-cloudflare-pages": "^0.3.0",
-    "fast-xml-parser": "^5.3.0"
+    "@paper-design/shaders": "^0.0.82",
+    "astro": "^7.4.13",
+    "astro-adapter-cloudflare-pages": "^0.3.1",
+    "fast-xml-parser": "^5.12.1"
   },
   "devDependencies": {
     "fontkit": "^2.0.4",
     "sharp": "^0.35.5",
     "subset-font": "^2.9.0",
     "typescript": "^7.0.2",
-    "wrangler": "^4.151.2"
+    "wrangler": "^4.168.0"
   },
   "allowScripts": {
     "workerd": true,
