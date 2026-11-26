@@ -1,6 +1,10 @@
 ---
+import type { SectionId } from '@/data/sections';
+
 interface Props {
 	title: string;
+	/** Anchor for the header menu on the top page. */
+	id?: SectionId;
 	class?: string;
 	/** Drops the body padding, e.g. for an image that should touch the frame. */
 	flush?: boolean;
@@ -8,10 +12,10 @@ interface Props {
 	open?: boolean;
 }
 
-const { title, class: className, flush = false, open = false } = Astro.props;
+const { title, id, class: className, flush = false, open = false } = Astro.props;
 ---
 
-<div class:list={['window-shell', className, { 'is-visible': open }]} data-reveal={open ? undefined : ''}>
+<div id={id} class:list={['window-shell', className, { 'is-visible': open }]} data-reveal={open ? undefined : ''}>
 	<span class="window-zoom" aria-hidden="true"></span>
 	<span class="window-zoom window-zoom--trail" aria-hidden="true"></span>
 	<section class="window">

@@ -8,7 +8,7 @@ import { profile } from '@/data/profile';
 const repositoriesUrl = `https://github.com/${profile.handle}?tab=repositories`;
 ---
 
-<Window title={`/${profile.handle}/works/`} class="window--right">
+<Window id="works" title={`/${profile.handle}/works/`} class="window--right">
 	<h2>Works</h2>
 	<WorksList server:defer>
 		<Loading slot="fallback" height="660px" />

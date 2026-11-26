@@ -33,6 +33,7 @@
 
 	/* Shared size of one pixel-art dot for icons, sprites and edges. */
 	--page-gutter: 16px;
+	--header-height: 54px;
 	--dot: 3px;
 	--font-body: 'PixelMplus10', 'PixelMplus10 Extra', monospace;
 	--font-heading: 'PixelMplus12', 'PixelMplus12 Extra', monospace;
@@ -48,6 +49,8 @@
 
 html {
 	scroll-behavior: smooth;
+	/* Keeps a window the header menu jumps to, or anything focused, clear of the fixed header. */
+	scroll-padding-top: calc(var(--header-height) + 24px);
 }
 
 body {
@@ -133,7 +136,7 @@ a:visited {
 .skip-link:focus {
 	left: 16px;
 	top: 16px;
-	z-index: 10;
+	z-index: 30;
 	padding: 0 8px;
 	background: var(--paper);
 	color: var(--ink);

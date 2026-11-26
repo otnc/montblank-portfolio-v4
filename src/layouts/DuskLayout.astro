@@ -8,6 +8,7 @@ import '@/styles/pixelmplus.css';
 import '@/styles/dusk.css';
 import GasLamps from '@/components/dusk/GasLamps.astro';
 import HarborLife from '@/components/dusk/HarborLife.astro';
+import SiteHeader from '@/components/dusk/SiteHeader.astro';
 import StonePath from '@/components/dusk/StonePath.astro';
 import { SITE_ORIGIN, profile } from '@/data/profile';
 import revealScript from '@/scripts/inline/reveal.js?raw';
@@ -58,6 +59,7 @@ const url = `${SITE_ORIGIN}${path}`;
 	<body>
 		<script is:inline set:html={revealScript} />
 		<a class="skip-link" href="#main">本文へ</a>
+		<SiteHeader />
 
 		<div class="site">
 			<slot name="hero" />
@@ -104,6 +106,11 @@ const url = `${SITE_ORIGIN}${path}`;
 </html>
 
 <style>
+	/* Room for the fixed header, so the top of the hero or the first window is not hidden under it. */
+	.site {
+		padding-top: var(--header-height);
+	}
+
 	/* Continues the water at the bottom of BayView and darkens toward the quay. */
 	.harbor {
 		position: relative;

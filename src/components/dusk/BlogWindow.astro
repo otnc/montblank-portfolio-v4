@@ -6,7 +6,7 @@ import PixelIcon from '@/components/PixelIcon.astro';
 import { writingSites } from '@/data/profile';
 ---
 
-<Window title="feeds/" class="window--right">
+<Window id="blog" title="feeds/" class="window--right">
 	<h2>Blog</h2>
 	<BlogPosts server:defer>
 		<Loading slot="fallback" height="600px" />

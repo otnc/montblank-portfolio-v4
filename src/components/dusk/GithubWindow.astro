@@ -5,7 +5,7 @@ import Window from '@/components/dusk/Window.astro';
 import { profile } from '@/data/profile';
 ---
 
-<Window title={`github.com/${profile.handle}`} class="window--left">
+<Window id="github" title={`github.com/${profile.handle}`} class="window--left">
 	<h2>GitHub</h2>
 	<GithubSummary server:defer>
 		<Loading slot="fallback" height="480px" />

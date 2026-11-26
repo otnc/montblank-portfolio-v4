@@ -1,0 +1,184 @@
+---
+/**
+ * The menu bar pinned to the top of every page: the logo back to the top, Links,
+ * and a menu that jumps to each window of the top page.
+ */
+import { profile } from '@/data/profile';
+import { sections } from '@/data/sections';
+---
+
+<header class="site-header">
+	<a class="site-header__name" href="/">
+		<img src="/logo.png" width="94" height="42" alt={profile.name} />
+	</a>
+	<nav class="site-header__nav" aria-label="サイト">
+		<a class="site-header__link" href="/links">Links</a>
+		<div class="site-header__menu" data-header-menu>
+			<button class="site-header__toggle" type="button" aria-expanded="false" aria-controls="header-menu" aria-label="Menu">
+				<svg class="site-header__bars" viewBox="0 0 7 5" width="21" height="15" shape-rendering="crispEdges" aria-hidden="true">
+					<path d="M0 0h7v1H0zM0 2h7v1H0zM0 4h7v1H0z" />
+				</svg>
+				<svg class="site-header__close" viewBox="0 0 5 5" width="15" height="15" shape-rendering="crispEdges" aria-hidden="true">
+					<path d="M0 0h1v1H0zM4 0h1v1H4zM1 1h1v1H1zM3 1h1v1H3zM2 2h1v1H2zM1 3h1v1H1zM3 3h1v1H3zM0 4h1v1H0zM4 4h1v1H4z" />
+				</svg>
+			</button>
+			<ul id="header-menu" class="site-header__list" hidden>
+				{
+					sections.map((section) => (
+						<li>
+							<a href={`/#${section.id}`}>{section.label}</a>
+						</li>
+					))
+				}
+			</ul>
+		</div>
+	</nav>
+</header>
+
+<script>
+	for (const menu of document.querySelectorAll<HTMLElement>('[data-header-menu]')) {
+		const toggle = menu.querySelector('button')!;
+		const list = menu.querySelector('ul')!;
+
+		const setOpen = (open: boolean) => {
+			toggle.setAttribute('aria-expanded', String(open));
+			list.hidden = !open;
+		};
+
+		toggle.addEventListener('click', () => setOpen(list.hidden));
+		// Picking a section scrolls the page under the menu, so the menu gets out of the way.
+		list.addEventListener('click', (event) => {
+			if ((event.target as Element).closest('a')) setOpen(false);
+		});
+		menu.addEventListener('keydown', (event) => {
+			if (event.key !== 'Escape' || list.hidden) return;
+			setOpen(false);
+			toggle.focus();
+		});
+		document.addEventListener('click', (event) => {
+			if (!list.hidden && !menu.contains(event.target as Node)) setOpen(false);
+		});
+	}
+</script>
+
+<style>
+	.site-header {
+		position: fixed;
+		inset: 0 0 auto;
+		z-index: 20;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+		height: var(--header-height);
+		padding: 0 var(--page-gutter);
+		background: var(--cream);
+		border-bottom: 3px solid var(--ink);
+		filter: drop-shadow(0 3px 0 rgb(0 0 0 / 0.25));
+	}
+
+	.site-header__name {
+		display: block;
+		transition: transform 0.12s steps(2);
+	}
+
+	.site-header__name img {
+		display: block;
+	}
+
+	.site-header__nav {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.site-header__link,
+	.site-header__toggle {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 36px;
+		height: 36px;
+		padding: 0 9px;
+		color: var(--ink);
+		text-decoration: none;
+	}
+
+	.site-header__toggle {
+		border: 0;
+		background: none;
+		font: inherit;
+		cursor: pointer;
+	}
+
+	.site-header__link:hover,
+	.site-header__link:focus-visible,
+	.site-header__toggle:hover,
+	.site-header__toggle:focus-visible,
+	.site-header__toggle[aria-expanded='true'] {
+		background: var(--marron-light);
+	}
+
+	.site-header__name:hover,
+	.site-header__name:focus-visible {
+		transform: translateY(-3px);
+	}
+
+	.site-header svg {
+		fill: currentColor;
+	}
+
+	.site-header__close,
+	.site-header__toggle[aria-expanded='true'] .site-header__bars {
+		display: none;
+	}
+
+	.site-header__toggle[aria-expanded='true'] .site-header__close {
+		display: block;
+	}
+
+	.site-header__menu {
+		position: relative;
+	}
+
+	/* Drops down like a window menu, in the same frame as the windows. */
+	.site-header__list {
+		position: absolute;
+		top: calc(100% + 9px);
+		right: 0;
+		min-width: 200px;
+		padding: 6px;
+		background: var(--cream);
+		border: 3px solid var(--ink);
+		filter: drop-shadow(3px 3px 0 var(--ink));
+		animation: menu-open 0.12s steps(3);
+	}
+
+	.site-header__list a {
+		display: block;
+		padding: 3px 12px;
+		color: var(--ink);
+		text-decoration: none;
+	}
+
+	.site-header__list a:hover,
+	.site-header__list a:focus-visible {
+		background: var(--marron-light);
+	}
+
+	@keyframes menu-open {
+		from {
+			clip-path: inset(0 0 100% 0);
+		}
+
+		to {
+			clip-path: inset(0);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.site-header__list {
+			animation: none;
+		}
+	}
+</style>

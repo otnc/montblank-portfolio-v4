@@ -5,7 +5,7 @@ import Window from '@/components/dusk/Window.astro';
 import { profile } from '@/data/profile';
 ---
 
-<Window title={`/${profile.handle}/contributions/`} class="window--left">
+<Window id="contributions" title={`/${profile.handle}/contributions/`} class="window--left">
 	<h2>Contributions</h2>
 	<p class="muted">他のリポジトリにマージされたプルリクエストと Issue</p>
 	<ContributionsList server:defer>
