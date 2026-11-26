@@ -133,6 +133,7 @@ export const crossLinks: CrossLink[] = [
 	{ author: 'sugimoto', url: 'https://sugimoto.fun', image: 'https://sugimoto.fun/icon6.png' },
 	{ author: 'Np', url: 'https://negapainter.work', image: 'https://negapainter.work/ogp.png' },
 	{ author: 'トラマト', url: 'https://toramutton.me', image: 'https://toramutton.me/icon.png' },
+	{ author: 'yonu', url: 'https://yonu.work', image: 'https://yonu.work/favicon.png' }
 ];
 
 // The way back to otoneko.cat, which links here from its bottle mail (otnc-portfolio-v3: src/data/profile.ts `altPersona`).
