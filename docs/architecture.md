@@ -33,7 +33,7 @@ src/
 │   │   ├── Loading.astro            server island が届くまでの「読み込み中」
 │   │   ├── CareerWindow.astro       経歴
 │   │   ├── CrossLinksWindow.astro   /links への入口と、相互リンクする方への情報
-│   │   ├── LinkingInfo.astro        相互リンクする方への情報 (名前、サイト名、URL) とアイコン・バナー。トップと /links で使う
+│   │   ├── LinkingInfo.astro        相互リンクする方への情報 (名前、サイト名、URL とコピーボタン) とアイコン・バナー。トップと /links で使う
 │   │   ├── TramStop.astro           岸壁と市電の通り。市電が otoneko.cat への隠しリンク
 │   │   ├── LanguageBar.astro        言語の割合のバー
 │   │   ├── StatsColumn.astro        スター、マージ済み PR、Issue の数 (ドット絵のアイコン付き)

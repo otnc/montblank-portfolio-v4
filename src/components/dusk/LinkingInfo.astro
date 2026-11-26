@@ -27,10 +27,16 @@ const siteInfo = [
 			<div>
 				<dt>{item.label}</dt>
 				<dd>{item.href ? <a href={item.href}>{item.value}</a> : item.value}</dd>
+				<dd>
+					<button class="copy-button" type="button" data-copy={item.value} aria-label={`Copy ${item.label}`}>
+						Copy
+					</button>
+				</dd>
 			</div>
 		))
 	}
 </dl>
+<p class="visually-hidden" role="status" data-copy-status></p>
 
 <h3 id="icon-and-banners" class="section-gap">アイコン・バナー</h3>
 <p class="muted">直リンクして大丈夫です。</p>
@@ -54,22 +60,41 @@ const siteInfo = [
 	}
 </ul>
 
+<script>
+	for (const button of document.querySelectorAll<HTMLButtonElement>('[data-copy]')) {
+		const status = button.closest('dl')?.nextElementSibling;
+		button.addEventListener('click', async () => {
+			try {
+				await navigator.clipboard.writeText(button.dataset.copy ?? '');
+			} catch {
+				return;
+			}
+			button.textContent = 'Copied';
+			if (status) status.textContent = `${button.dataset.copy} をコピーしました`;
+			setTimeout(() => {
+				button.textContent = 'Copy';
+			}, 1500);
+		});
+	}
+</script>
+
 <style>
 	.section-gap {
 		margin-top: 24px;
 		color: var(--heading);
 	}
 
+	/* One grid for all rows, so the copy buttons line up in a column after the longest value. */
 	.site-info {
 		display: grid;
-		gap: 4px;
+		grid-template-columns: 4em minmax(0, max-content) auto;
+		align-items: center;
+		gap: 4px 16px;
 		margin-top: 8px;
 	}
 
 	.site-info div {
-		display: grid;
-		grid-template-columns: 4em 1fr;
-		gap: 16px;
+		display: contents;
 	}
 
 	.site-info dt {
@@ -79,6 +104,35 @@ const siteInfo = [
 	.site-info dd {
 		margin: 0;
 		overflow-wrap: anywhere;
+	}
+
+	.copy-button {
+		min-width: 6em;
+		padding: 0 8px;
+		border: 3px solid var(--ink);
+		background: none;
+		color: var(--ink);
+		font: inherit;
+		cursor: pointer;
+		transition: transform 0.12s steps(2);
+	}
+
+	.copy-button:hover,
+	.copy-button:focus-visible {
+		background: var(--marron-light);
+		color: var(--ink);
+	}
+
+	.copy-button:active {
+		transform: translateY(2px);
+	}
+
+	.visually-hidden {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip-path: inset(50%);
 	}
 
 	.banners {
