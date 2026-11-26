@@ -16,7 +16,7 @@ import { profile } from '@/data/profile';
 export const prerender = true;
 ---
 
-<DuskLayout path="/" title={`${profile.name}のポートフォリオ`} description={profile.bio}>
+<DuskLayout path="/" title={profile.siteName} description={profile.bio}>
 	<Hero slot="hero" />
 	<Marquee slot="hero" messages={profile.messages} />
 

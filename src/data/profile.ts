@@ -4,6 +4,7 @@ export const SITE_ORIGIN = 'https://montblank.fun';
 
 export const profile = {
 	name: 'まろん｡',
+	siteName: 'まろん｡のポートフォリオ',
 	handle: 'otnc',
 	twitter: '@rin_montblank',
 	icon: '/icon.png',
@@ -129,28 +130,6 @@ export const crossLinks: CrossLink[] = [
 	{ author: 'sugimoto', url: 'https://sugimoto.fun', banner: { src: '/partners/sugimoto.webp', width: 120, height: 120 } },
 	{ author: 'Np', url: 'https://negapainter.work', banner: { src: '/partners/np.webp', width: 265, height: 120 } },
 ];
-
-const crossLinkRequestMessage = [
-	'相互リンクしませんか！',
-	'',
-	'URL:',
-	'あなたの名前:',
-	'紹介文:(任意)',
-	'サイト名:(任意)',
-	'サムネイルURL:(任意)',
-	'',
-	'※OGPから取得できるのであれば任意の部分は不要',
-].join('\n');
-
-export const crossLinkRequest = {
-	url: `https://twitter.com/messages/compose?recipient_id=1517667933291704320&text=${encodeURIComponent(crossLinkRequestMessage)}`,
-	requirements: [
-		'上のボタンからTwitterのDMにアクセスし、そこで申請すること',
-		'あなたのサイトが常時アクセス可能であること',
-		'あなたのサイトのURL、サイト名、名義の掲載を許可すること',
-		'あなたのサイトにこのサイトのURLとサイト名を掲載すること',
-	],
-};
 
 // The way back to otoneko.cat, which links here from its bottle mail (otnc-portfolio-v3: src/data/profile.ts `altPersona`).
 export const otherSelf = {

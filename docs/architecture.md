@@ -30,7 +30,7 @@ src/
 │   │   ├── ContributionsList.astro  他のリポジトリにマージされた PR の一覧 (server island)
 │   │   ├── Loading.astro            server island が届くまでの「読み込み中」
 │   │   ├── CareerWindow.astro       経歴
-│   │   ├── CrossLinksWindow.astro   相互リンク、申請、このサイトのバナー
+│   │   ├── CrossLinksWindow.astro   相互リンク、相互リンクする方への情報、アイコン・バナー
 │   │   ├── TramStop.astro           岸壁と市電の通り。市電が otoneko.cat への隠しリンク
 │   │   ├── LanguageBar.astro        言語の割合のバー
 │   │   ├── StatsColumn.astro        スター、マージ済み PR、Issue の数 (ドット絵のアイコン付き)

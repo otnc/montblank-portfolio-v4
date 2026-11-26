@@ -6,7 +6,7 @@ import { profile } from '@/data/profile';
 Astro.response.status = 404;
 ---
 
-<DuskLayout path="/404" title={`404 - ${profile.name}のポートフォリオ`} description="ページが見つかりませんでした。">
+<DuskLayout path="/404" title={`404 - ${profile.siteName}`} description="ページが見つかりませんでした。">
 	<main id="main" class="page not-found">
 		<Window title="404.txt - メモ帳">
 			<h1>404</h1>
