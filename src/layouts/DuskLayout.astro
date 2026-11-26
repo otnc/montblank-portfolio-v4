@@ -11,6 +11,7 @@ import HarborLife from '@/components/dusk/HarborLife.astro';
 import SiteHeader from '@/components/dusk/SiteHeader.astro';
 import StonePath from '@/components/dusk/StonePath.astro';
 import { SITE_ORIGIN, profile } from '@/data/profile';
+import type { PageSection } from '@/data/sections';
 import revealScript from '@/scripts/inline/reveal.js?raw';
 
 interface Props {
@@ -18,9 +19,11 @@ interface Props {
 	description: string;
 	/** Path of this page, used for the canonical URL. */
 	path: string;
+	/** Places on this page for the header menu; the menu is left out without them. */
+	sections?: PageSection[];
 }
 
-const { title, description, path } = Astro.props;
+const { title, description, path, sections } = Astro.props;
 const url = `${SITE_ORIGIN}${path}`;
 ---
 
@@ -59,7 +62,7 @@ const url = `${SITE_ORIGIN}${path}`;
 	<body>
 		<script is:inline set:html={revealScript} />
 		<a class="skip-link" href="#main">本文へ</a>
-		<SiteHeader />
+		<SiteHeader sections={sections} />
 
 		<div class="site">
 			<slot name="hero" />

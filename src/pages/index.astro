@@ -11,12 +11,13 @@ import TramStop from '@/components/dusk/TramStop.astro';
 import WorksWindow from '@/components/dusk/WorksWindow.astro';
 import DuskLayout from '@/layouts/DuskLayout.astro';
 import { profile } from '@/data/profile';
+import { topSections } from '@/data/sections';
 
 // Served as static HTML; the windows fetch GitHub and the feeds through server islands once the page is open.
 export const prerender = true;
 ---
 
-<DuskLayout path="/" title={profile.siteName} description={profile.bio}>
+<DuskLayout path="/" title={profile.siteName} description={profile.bio} sections={topSections}>
 	<Hero slot="hero" />
 	<Marquee slot="hero" messages={profile.messages} />
 

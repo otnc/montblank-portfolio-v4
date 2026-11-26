@@ -1,10 +1,17 @@
 ---
 /**
  * The menu bar pinned to the top of every page: the logo back to the top, Links,
- * and a menu that jumps to each window of the top page.
+ * and a menu that jumps to each section of the current page.
  */
 import { profile } from '@/data/profile';
-import { sections } from '@/data/sections';
+import type { PageSection } from '@/data/sections';
+
+interface Props {
+	/** What the menu lists; without any, the page has no menu. */
+	sections?: PageSection[];
+}
+
+const { sections = [] } = Astro.props;
 ---
 
 <header class="site-header">
@@ -13,25 +20,27 @@ import { sections } from '@/data/sections';
 	</a>
 	<nav class="site-header__nav" aria-label="サイト">
 		<a class="site-header__link" href="/links">Links</a>
-		<div class="site-header__menu" data-header-menu>
-			<button class="site-header__toggle" type="button" aria-expanded="false" aria-controls="header-menu" aria-label="Menu">
-				<svg class="site-header__bars" viewBox="0 0 7 5" width="21" height="15" shape-rendering="crispEdges" aria-hidden="true">
-					<path d="M0 0h7v1H0zM0 2h7v1H0zM0 4h7v1H0z" />
-				</svg>
-				<svg class="site-header__close" viewBox="0 0 5 5" width="15" height="15" shape-rendering="crispEdges" aria-hidden="true">
-					<path d="M0 0h1v1H0zM4 0h1v1H4zM1 1h1v1H1zM3 1h1v1H3zM2 2h1v1H2zM1 3h1v1H1zM3 3h1v1H3zM0 4h1v1H0zM4 4h1v1H4z" />
-				</svg>
-			</button>
-			<ul id="header-menu" class="site-header__list" hidden>
-				{
-					sections.map((section) => (
-						<li>
-							<a href={`/#${section.id}`}>{section.label}</a>
-						</li>
-					))
-				}
-			</ul>
-		</div>
+		{
+			sections.length > 0 && (
+				<div class="site-header__menu" data-header-menu>
+					<button class="site-header__toggle" type="button" aria-expanded="false" aria-controls="header-menu" aria-label="Menu">
+						<svg class="site-header__bars" viewBox="0 0 7 5" width="21" height="15" shape-rendering="crispEdges" aria-hidden="true">
+							<path d="M0 0h7v1H0zM0 2h7v1H0zM0 4h7v1H0z" />
+						</svg>
+						<svg class="site-header__close" viewBox="0 0 5 5" width="15" height="15" shape-rendering="crispEdges" aria-hidden="true">
+							<path d="M0 0h1v1H0zM4 0h1v1H4zM1 1h1v1H1zM3 1h1v1H3zM2 2h1v1H2zM1 3h1v1H1zM3 3h1v1H3zM0 4h1v1H0zM4 4h1v1H4z" />
+						</svg>
+					</button>
+					<ul id="header-menu" class="site-header__list" hidden>
+						{sections.map((section) => (
+							<li>
+								<a href={`#${section.id}`}>{section.label}</a>
+							</li>
+						))}
+					</ul>
+				</div>
+			)
+		}
 	</nav>
 </header>
 

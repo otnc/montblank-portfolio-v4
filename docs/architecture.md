@@ -18,7 +18,7 @@ src/
 │   │   ├── BayView.astro            函館山、ロープウェイ、元町の屋根、赤レンガ倉庫と運河、水面
 │   │   ├── Marquee.astro            流れるメッセージ
 │   │   ├── HarborLife.astro         港の水面の波、泳ぐイカ、カモメ
-│   │   ├── SiteHeader.astro         画面上部に固定するヘッダー。ロゴ (トップへ)、Links、各ウィンドウへ飛ぶメニュー
+│   │   ├── SiteHeader.astro         画面上部に固定するヘッダー。ロゴ (トップへ)、Links、そのページのセクションへ飛ぶメニュー
 │   │   ├── StonePath.astro          ウィンドウの下の石畳 (八幡坂の舗装)
 │   │   ├── GasLamps.astro           石畳の道の両端のガス灯
 │   │   ├── AboutWindow.astro        自己紹介、キャッチコピー、趣味・所属など、SNS
@@ -44,7 +44,7 @@ src/
 │   └── inline/                  HTML に直接書くスクリプト (表示時のアニメーション、流れるメッセージ、タイプライター)
 ├── data/
 │   ├── profile.ts               名前、自己紹介、所属、経歴、アカウント、相互リンク、otoneko.cat の紹介文
-│   ├── sections.ts              ヘッダーのメニューに出すトップのウィンドウと、その id
+│   ├── sections.ts              ヘッダーのメニューに出す、ページごとのセクションと id
 │   ├── scene.ts                 背景のドット絵の色
 │   ├── pixel-icons.ts           アカウントと記事サイトのドット絵、octocat
 │   ├── pixel-files.ts           /pixel/ に静的ファイルとして出すドット絵の一覧
@@ -159,4 +159,4 @@ GraphQL にしたのは、リクエスト数を抑えるためです。Pages の
 1. `src/components/dusk/` に部品を作り、中身を `Window` で包みます。`class="window--left"` か `window--right` で左右に少しずらします。
 2. 部品のスタイルはその `.astro` の `<style>` に書きます。
 3. `src/pages/index.astro` の `<main>` に並べます。
-4. `src/data/sections.ts` に `{ id, label }` を足し、`Window` に同じ `id` を渡します。ヘッダーのメニューに出て、`/#id` で飛べるようになります。
+4. `src/data/sections.ts` に `{ id, label }` を足し、`Window` に同じ `id` を渡します。ヘッダーのメニューに出て、`#id` で飛べるようになります。

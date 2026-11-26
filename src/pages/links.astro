@@ -3,15 +3,16 @@ import LinkingInfo from '@/components/dusk/LinkingInfo.astro';
 import Window from '@/components/dusk/Window.astro';
 import DuskLayout from '@/layouts/DuskLayout.astro';
 import { crossLinks, profile } from '@/data/profile';
+import { linksSections } from '@/data/sections';
 
 export const prerender = true;
 
 const hostname = (url: string) => new URL(url).hostname;
 ---
 
-<DuskLayout path="/links" title={`Links - ${profile.siteName}`} description="相互リンクしているサイトの一覧です。">
+<DuskLayout path="/links" title={`Links - ${profile.siteName}`} description="相互リンクしているサイトの一覧です。" sections={linksSections}>
 	<main id="main" class="page links-page">
-		<Window title="links.txt">
+		<Window id="cross-links" title="links.txt">
 			<h1>Links</h1>
 			<div class="partners-box">
 				<ul class="partners" data-partners>

@@ -1,10 +1,8 @@
 ---
-import type { SectionId } from '@/data/sections';
-
 interface Props {
 	title: string;
-	/** Anchor for the header menu on the top page. */
-	id?: SectionId;
+	/** Anchor for the header menu (see src/data/sections.ts). */
+	id?: string;
 	class?: string;
 	/** Drops the body padding, e.g. for an image that should touch the frame. */
 	flush?: boolean;
