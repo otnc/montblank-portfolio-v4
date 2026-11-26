@@ -32,6 +32,7 @@
 	--marquee-text: var(--ginkgo);
 
 	/* Shared size of one pixel-art dot for icons, sprites and edges. */
+	--page-gutter: 16px;
 	--dot: 3px;
 	--font-body: 'PixelMplus10', 'PixelMplus10 Extra', monospace;
 	--font-heading: 'PixelMplus12', 'PixelMplus12 Extra', monospace;
@@ -268,7 +269,7 @@ a:visited {
 	gap: 96px;
 	max-width: 1040px;
 	margin: 0 auto;
-	padding: 96px 16px 0;
+	padding: 96px var(--page-gutter) 0;
 }
 
 .page .window--left {
@@ -280,6 +281,11 @@ a:visited {
 }
 
 @media (max-width: 640px) {
+	/* A wider bare edge on phones, where a swipe that starts on a window is hard to tell from one meant for the page. */
+	:root {
+		--page-gutter: 40px;
+	}
+
 	h1 {
 		font-size: 36px;
 		line-height: 48px;
