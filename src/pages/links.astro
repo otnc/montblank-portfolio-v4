@@ -1,0 +1,129 @@
+---
+import LinkingInfo from '@/components/dusk/LinkingInfo.astro';
+import Window from '@/components/dusk/Window.astro';
+import DuskLayout from '@/layouts/DuskLayout.astro';
+import { crossLinks, profile } from '@/data/profile';
+
+export const prerender = true;
+
+const hostname = (url: string) => new URL(url).hostname;
+---
+
+<DuskLayout path="/links" title={`Links - ${profile.siteName}`} description="相互リンクしているサイトの一覧です。">
+	<main id="main" class="page links-page">
+		<Window title="links.txt">
+			<h1>Links</h1>
+			<div class="partners-box">
+				<ul class="partners" data-partners>
+					{
+						crossLinks.map((link) => (
+							<li>
+								<a href={link.url} target="_blank" rel="noreferrer">
+									{link.image && <img src={link.image} alt="" decoding="async" />}
+									<span class="partners__text">
+										<span class="partners__name">{link.author}</span>
+										<span class="muted">{hostname(link.url)}</span>
+									</span>
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</div>
+			<LinkingInfo />
+		</Window>
+		<script is:inline>
+			// Their sizes are not written down, so a wide image is told apart from an icon once it has loaded.
+			for (const image of document.querySelectorAll('[data-partners] img')) {
+				const markIfWide = () => {
+					if (image.naturalWidth > image.naturalHeight * 1.5) image.closest('li').classList.add('partners__wide');
+				};
+				if (image.complete) markIfWide();
+				else image.addEventListener('load', markIfWide, { once: true });
+			}
+		</script>
+	</main>
+</DuskLayout>
+
+<style>
+	.links-page {
+		padding-top: 160px;
+		padding-bottom: 96px;
+	}
+
+	.links-page h1 {
+		color: var(--heading);
+	}
+
+	.partners-box {
+		container-type: inline-size;
+		margin-top: 16px;
+	}
+
+	.partners {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+		gap: 8px 16px;
+	}
+
+	/* An icon sits left of the name; a banner, or anything on a narrow screen, sits above it. */
+	.partners a {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		height: 100%;
+		padding: 8px;
+		color: var(--ink);
+		text-decoration: none;
+	}
+
+	.partners__wide a {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 8px;
+	}
+
+	@container (max-width: 480px) {
+		.partners a {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 8px;
+		}
+	}
+
+	/* Their images are photos and illustrations, not pixel art, so they keep smooth scaling. */
+	.partners img {
+		flex: none;
+		width: 96px;
+		height: 96px;
+		object-fit: cover;
+		outline: 3px solid var(--ink);
+		transition: transform 0.12s steps(2);
+	}
+
+	/* Banners keep their own shape and are never enlarged past their size, at most 96px tall. */
+	.partners__wide img {
+		width: auto;
+		height: auto;
+		max-width: 100%;
+		max-height: 96px;
+	}
+
+	.partners a:hover img {
+		transform: translateY(-3px);
+	}
+
+	.partners__text {
+		display: grid;
+		min-width: 0;
+	}
+
+	.partners a:hover,
+	.partners a:focus-visible {
+		background: var(--marron-light);
+	}
+
+	.partners__name {
+		text-decoration: underline;
+	}
+</style>

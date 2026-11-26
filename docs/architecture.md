@@ -7,6 +7,7 @@ Astro 7 を `output: 'server'` で動かし、Cloudflare Pages に置いてい�
 ```text
 src/
 ├── pages/index.astro            部品を並べるだけ。ビルド時に静的な HTML になる
+├── pages/links.astro            相互リンクの一覧と、相互リンクする方への情報。ビルド時に静的な HTML になる
 ├── pages/404.astro              見つからないページ
 ├── pages/pixel/[name].svg.ts    ドット絵の SVG をビルド時に dist/pixel/ へ書き出す
 ├── layouts/DuskLayout.astro     <head>、港の水面と石畳、フッター、共通スクリプト
@@ -30,7 +31,8 @@ src/
 │   │   ├── ContributionsList.astro  他のリポジトリにマージされた PR の一覧 (server island)
 │   │   ├── Loading.astro            server island が届くまでの「読み込み中」
 │   │   ├── CareerWindow.astro       経歴
-│   │   ├── CrossLinksWindow.astro   相互リンク、相互リンクする方への情報、アイコン・バナー
+│   │   ├── CrossLinksWindow.astro   /links への入口と、相互リンクする方への情報
+│   │   ├── LinkingInfo.astro        相互リンクする方への情報 (名前、サイト名、URL) とアイコン・バナー。トップと /links で使う
 │   │   ├── TramStop.astro           岸壁と市電の通り。市電が otoneko.cat への隠しリンク
 │   │   ├── LanguageBar.astro        言語の割合のバー
 │   │   ├── StatsColumn.astro        スター、マージ済み PR、Issue の数 (ドット絵のアイコン付き)
@@ -142,7 +144,7 @@ GraphQL にしたのは、リクエスト数を抑えるためです。Pages の
 
 ### 相互リンクを足す
 
-`src/data/profile.ts` の `crossLinks` に `{ author, url }` を足します。画像は相手のサイトの OGP 画像かアイコンを高さ 120px に縮めて `public/partners/` に置き、`banner: { src, width, height }` で指定します (表示は半分の大きさ)。大きな元画像を直リンクすると重くなるので、必ず縮めて置きます。
+`src/data/profile.ts` の `crossLinks` に `{ author, url, image }` を足します。一覧は `/links` に出ます。`image` には相手のサイトの画像の URL をそのまま書きます。相手が相互リンク用のバナーを用意していればバナー、なければ OGP 画像かページ内のアイコンを使います。画像の大きさは書かなくてよく、読み込んだときに横長 (幅が高さの1.5倍より大きい) ならバナー、そうでなければアイコンとして並べます。足す前に、相手のサイトの相互リンクのページなどで直リンクが禁止されていないかを確かめます。
 
 ### アカウントを足す
 

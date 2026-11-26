@@ -118,17 +118,21 @@ export const career: CareerItem[] = [
 export interface CrossLink {
 	author: string;
 	url: string;
-	/** Their banner or icon, shown at half size next to the name. Kept small in public/partners/, taken from their OGP image or icon. */
-	banner?: { src: string; width: number; height: number };
+	/**
+	 * Their banner if they offer one, otherwise their OGP image or icon, loaded straight from their site so it follows their updates.
+	 * Its size is not written down: /links tells a wide banner from an icon once it has loaded.
+	 */
+	image?: string;
 }
 
-// Sites that link back here.
+// Sites that link back here, listed on /links. None of them forbids hotlinking (checked 2026/11).
 export const crossLinks: CrossLink[] = [
-	{ author: 'キノえもん', url: 'https://kinoemon.com', banner: { src: '/partners/kinoemon.webp', width: 120, height: 120 } },
-	{ author: 'shikoshib', url: 'https://shikoshib.ru', banner: { src: '/partners/shikoshib.webp', width: 120, height: 120 } },
-	{ author: 'ActiveTK.', url: 'https://profile.activetk.jp', banner: { src: '/partners/activetk.webp', width: 120, height: 120 } },
-	{ author: 'sugimoto', url: 'https://sugimoto.fun', banner: { src: '/partners/sugimoto.webp', width: 120, height: 120 } },
-	{ author: 'Np', url: 'https://negapainter.work', banner: { src: '/partners/np.webp', width: 265, height: 120 } },
+	{ author: 'キノえもん', url: 'https://kinoemon.com', image: 'https://kinoemon.com/icon.webp' },
+	{ author: 'shikoshib', url: 'https://shikoshib.ru', image: 'https://shikoshib.ru/assets/logo-ja.png' },
+	{ author: 'ActiveTK.', url: 'https://profile.activetk.jp', image: 'https://profile.activetk.jp/avatar.png' },
+	{ author: 'sugimoto', url: 'https://sugimoto.fun', image: 'https://sugimoto.fun/icon6.png' },
+	{ author: 'Np', url: 'https://negapainter.work', image: 'https://negapainter.work/ogp.png' },
+	{ author: 'トラマト', url: 'https://toramutton.me', image: 'https://toramutton.me/icon.png' },
 ];
 
 // The way back to otoneko.cat, which links here from its bottle mail (otnc-portfolio-v3: src/data/profile.ts `altPersona`).
