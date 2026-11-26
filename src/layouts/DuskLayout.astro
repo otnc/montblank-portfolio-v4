@@ -72,6 +72,13 @@ const url = `${SITE_ORIGIN}${path}`;
 				<HarborLife />
 				<StonePath />
 				<GasLamps />
+				{
+					path !== '/' && (
+						<nav class="home-nav" aria-label="ページ">
+							<a class="pixel-button" href="/">Home</a>
+						</nav>
+					)
+				}
 				<slot />
 			</div>
 
@@ -101,6 +108,14 @@ const url = `${SITE_ORIGIN}${path}`;
 	.harbor {
 		position: relative;
 		background: linear-gradient(#7d5c88 0 25%, #6c5888 25% 50%, #56497a 50% 75%, #423a68 75% 100%);
+	}
+
+	/* Every page but the top has no hero, so the way back sits above its window, on the column's left edge. */
+	.home-nav {
+		position: absolute;
+		top: 48px;
+		left: max(var(--page-gutter), calc(50% - 504px));
+		z-index: 2;
 	}
 
 	.harbor__edges {
