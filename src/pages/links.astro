@@ -4,10 +4,12 @@ import Window from '@/components/dusk/Window.astro';
 import DuskLayout from '@/layouts/DuskLayout.astro';
 import { crossLinks, profile } from '@/data/profile';
 import { linksSections } from '@/data/sections';
+import { crossLinkImage } from '@/lib/cross-link-image';
 
 export const prerender = true;
 
 const hostname = (url: string) => new URL(url).hostname;
+const partners = await Promise.all(crossLinks.map(async (link) => ({ ...link, image: await crossLinkImage(link) })));
 ---
 
 <DuskLayout path="/links" title={`Links - ${profile.siteName}`} description="相互リンクしているサイトの一覧です。" sections={linksSections}>
@@ -17,7 +19,7 @@ const hostname = (url: string) => new URL(url).hostname;
 			<div class="partners-box">
 				<ul class="partners" data-partners>
 					{
-						crossLinks.map((link) => (
+						partners.map((link) => (
 							<li>
 								<a href={link.url} target="_blank" rel="noreferrer">
 									{link.image && <img src={link.image} alt="" decoding="async" />}

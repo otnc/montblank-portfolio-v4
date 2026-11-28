@@ -119,10 +119,11 @@ export interface CrossLink {
 	author: string;
 	url: string;
 	/**
-	 * Their banner if they offer one, otherwise their OGP image or icon, loaded straight from their site so it follows their updates.
+	 * Their banner if they offer one, loaded straight from their site so it follows their updates.
+	 * Left out, /links shows the OGP image or icon their page points to; `false` shows no image.
 	 * Its size is not written down: /links tells a wide banner from an icon once it has loaded.
 	 */
-	image?: string;
+	image?: string | false;
 }
 
 // Sites that link back here, listed on /links. None of them forbids hotlinking (checked 2026/11).
