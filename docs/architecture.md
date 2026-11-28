@@ -57,7 +57,7 @@ src/
 │   ├── github-public.ts         同じものをトークンなしで取る
 │   ├── feeds.ts                 ブログ、Zenn、Qiita、note の RSS / Atom
 │   ├── cache.ts                 取得結果を Cloudflare のキャッシュに1時間置く
-│   ├── cross-link-image.ts      相互リンク先の画像の URL (書いていなければ相手のページの OGP 画像やアイコン)
+│   ├── cross-link-image.ts      相互リンク先の画像の URL (書いていなければ相手のページの OGP 画像、なければ favicon)
 │   ├── pixel-grid.ts            コードで描くドット絵 (色の格子を SVG のパスにする)
 │   ├── pixel-path.ts            小さなドット絵をパスにまとめる
 │   └── format.ts                数と日付の表記
@@ -148,7 +148,7 @@ GraphQL にしたのは、リクエスト数を抑えるためです。Pages の
 
 ### 相互リンクを足す
 
-`src/data/profile.ts` の `crossLinks` に `{ author, url, image }` を足します。一覧は `/links` に出ます。相手が相互リンク用のバナーを用意していれば、`image` にその URL をそのまま書きます。`image` を省くと、ビルド時に `src/lib/cross-link-image.ts` が相手のページを取得し、`og:image`、`twitter:image`、`apple-touch-icon`、`icon` の順に見つかった画像の URL を使います。ページを取得できなければ画像なしで並べます。画像を出したくないときは `image: false` と書きます。画像の大きさは書かなくてよく、読み込んだときに横長 (幅が高さの1.5倍より大きい) ならバナー、そうでなければアイコンとして並べます。足す前に、相手のサイトの相互リンクのページなどで直リンクが禁止されていないかを確かめます。
+`src/data/profile.ts` の `crossLinks` に `{ author, url, image }` を足します。一覧は `/links` に出ます。相手が相互リンク用のバナーを用意していれば、`image` にその URL をそのまま書きます。`image` を省くと、ビルド時に `src/lib/cross-link-image.ts` が相手のページを取得し、`og:image` を優先し、なければ favicon (`icon`、`apple-touch-icon` の順) の画像の URL を使います。ページを取得できなければ画像なしで並べます。画像を出したくないときは `image: false` と書きます。画像の大きさは書かなくてよく、読み込んだときに横長 (幅が高さの1.5倍より大きい) ならバナー、そうでなければアイコンとして並べます。足す前に、相手のサイトの相互リンクのページなどで直リンクが禁止されていないかを確かめます。
 
 ### アカウントを足す
 

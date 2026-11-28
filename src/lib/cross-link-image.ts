@@ -1,11 +1,10 @@
 import type { CrossLink } from '@/data/profile';
 
-// Tried in order: a site's own share image first, then its icons.
+// Tried in order: the OGP image first, then the favicon.
 const imageTagPatterns = [
 	/<meta[^>]+(?:property|name)=["']og:image(?::url)?["'][^>]*>/i,
-	/<meta[^>]+(?:property|name)=["']twitter:image["'][^>]*>/i,
-	/<link[^>]+rel=["']apple-touch-icon["'][^>]*>/i,
 	/<link[^>]+rel=["'](?:shortcut )?icon["'][^>]*>/i,
+	/<link[^>]+rel=["']apple-touch-icon["'][^>]*>/i,
 ];
 
 const attribute = (tag: string, name: string) => tag.match(new RegExp(`${name}=["']([^"']+)["']`, 'i'))?.[1];
@@ -28,7 +27,7 @@ async function findPageImage(pageUrl: string): Promise<string | undefined> {
 
 /**
  * Picks the image /links shows for a cross link: the one written in the data, nothing when it is `false`,
- * and otherwise the OGP image (or icon) their page points to, looked up when the page is built.
+ * and otherwise the OGP image (or favicon) their page points to, looked up when the page is built.
  * The image itself is still loaded from their site, so it follows their updates.
  *
  * @example

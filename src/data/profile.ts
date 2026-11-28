@@ -120,7 +120,7 @@ export interface CrossLink {
 	url: string;
 	/**
 	 * Their banner if they offer one, loaded straight from their site so it follows their updates.
-	 * Left out, /links shows the OGP image or icon their page points to; `false` shows no image.
+	 * Left out, /links shows the OGP image their page points to, or its favicon; `false` shows no image.
 	 * Its size is not written down: /links tells a wide banner from an icon once it has loaded.
 	 */
 	image?: string | false;
